@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaGithub } from 'react-icons/fa'
-import { FiLayers } from 'react-icons/fi'
+import Logo from '../assets/logo.svg'
 
 const socials = [
   { icon: FaTwitter, href: '#', label: 'Twitter' },
@@ -15,9 +15,9 @@ const Footer = () => {
     <footer className="border-t border-edge-subtle bg-ink-950">
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 lg:px-12">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-accent-blue/30 bg-accent-blue/10 text-accent-cyan">
-              <FiLayers size={16} />
+          <Link to="/" className="group flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-accent-blue/30 bg-accent-blue/10 p-1 text-accent-cyan shadow-glow-blue transition-all duration-300 group-hover:scale-105">
+              <img src={Logo} alt="LinkSphere" className="h-full w-full object-contain" />
             </div>
             <span className="font-display text-base font-bold text-white">
               Link<span className="text-accent-cyan">Sphere</span>
@@ -25,7 +25,7 @@ const Footer = () => {
           </Link>
 
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
             <span className="font-mono text-xs text-slate-400">All edge systems operational</span>
           </div>
 

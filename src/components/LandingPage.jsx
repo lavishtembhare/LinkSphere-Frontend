@@ -5,6 +5,7 @@ import {
   FiCopy, FiCheck, FiArrowRight, FiZap, FiCheckCircle
 } from 'react-icons/fi'
 import Card from './Card'
+import Logo from '../assets/logo.svg'
 import { useCountUp, useReveal } from '../hooks/useAnimations'
 
 const features = [
@@ -54,14 +55,14 @@ const HeroDemo = () => {
           <span className="ml-2 font-mono text-[11px] text-slate-400">Live URL Sandbox</span>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
           {clicks.toLocaleString()} clicks tracked
         </span>
       </div>
 
       <form onSubmit={handleSimulate} className="space-y-3">
         <div>
-          <label className="block text-[11px] font-medium text-slate-400 mb-1">Target Long URL</label>
+          <label className="mb-1 block text-[11px] font-medium text-slate-400">Target Long URL</label>
           <div className="flex rounded-lg border border-edge-subtle bg-ink-950 px-3 py-2 focus-within:border-accent-blue/60">
             <input
               type="text"
@@ -76,7 +77,7 @@ const HeroDemo = () => {
         <button
           type="submit"
           disabled={isGenerating}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-accent-blue/20 border border-accent-blue/40 py-2 text-xs font-semibold text-accent-cyan transition-all hover:bg-accent-blue/30"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-accent-blue/40 bg-accent-blue/20 py-2 text-xs font-semibold text-accent-cyan transition-all hover:bg-accent-blue/30"
         >
           {isGenerating ? 'Shortening link...' : 'Compress URL'}
           <FiZap size={13} />
@@ -94,8 +95,8 @@ const HeroDemo = () => {
           <button
             onClick={handleCopy}
             className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${copied
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'bg-accent-blue text-ink font-bold hover:bg-accent-cyan'
+                ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
+                : 'bg-accent-blue font-bold text-ink hover:bg-accent-cyan'
               }`}
           >
             {copied ? (
@@ -120,28 +121,34 @@ const LandingPage = () => {
 
   return (
     <div className="relative overflow-hidden bg-grid-pattern">
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-accent-blue/15 blur-[140px] animate-pulse-glow" />
-      <div className="pointer-events-none absolute top-[600px] -left-32 h-[450px] w-[450px] rounded-full bg-accent-cyan/10 blur-[130px] animate-float-slow" />
-      <div className="pointer-events-none absolute top-[1200px] -right-32 h-[500px] w-[500px] rounded-full bg-accent-indigo/10 blur-[150px] animate-float" />
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 animate-pulse-glow rounded-full bg-accent-blue/15 blur-[140px]" />
+      <div className="pointer-events-none absolute top-[600px] -left-32 h-[450px] w-[450px] animate-float-slow rounded-full bg-accent-cyan/10 blur-[130px]" />
+      <div className="pointer-events-none absolute top-[1200px] -right-32 h-[500px] w-[500px] animate-float rounded-full bg-accent-indigo/10 blur-[150px]" />
 
       {/* Hero Section */}
       <section className="relative mx-auto flex max-w-6xl flex-col items-center gap-14 px-5 pb-24 pt-16 sm:px-8 lg:flex-row lg:px-12 lg:pt-24">
         <div className="flex-1 text-center lg:text-left">
           <div className="inline-flex items-center gap-2 rounded-full border border-accent-blue/30 bg-accent-blue/10 px-3.5 py-1 text-xs font-medium text-accent-cyan backdrop-blur-md">
-            <span className="flex h-2 w-2 rounded-full bg-accent-cyan animate-ping" />
+            <span className="flex h-2 w-2 animate-ping rounded-full bg-accent-cyan" />
             V2.4 Powered by Global Edge Routing
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.12]">
-            {/* First line: smooth blur-fade up */}
-            <span className="inline-block animate-[title-reveal_0.8s_cubic-bezier(0.16,1,0.3,1)_forwards] text-white">
-              Smarter links.
-            </span>{' '}
+          <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.12]">
+            {/* Line 1: Continuous gentle float & subtle shimmer */}
+            <span className="inline-block animate-[text-float-subtle_6s_ease-in-out_infinite]">
+              <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-[length:200%_auto] bg-clip-text text-transparent animate-[white-shimmer_7s_ease_infinite]">
+                Smarter links.
+              </span>
+            </span>
+
             <br />
-            {/* Second line: delayed reveal with dynamic multi-stop gradient wave */}
-            <span className="inline-block animate-[title-reveal_0.8s_cubic-bezier(0.16,1,0.3,1)_0.2s_both]">
-              <span className="bg-gradient-to-r from-accent-blue via-accent-cyan via-white to-accent-blue bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-flow_5s_ease_infinite] drop-shadow-[0_0_35px_rgba(56,189,248,0.35)]">
-                Sharper analytics.
+
+            {/* Line 2: Continuous electric-blue/cyan gradient wave + pulsing neon aura */}
+            <span className="inline-block mt-1 animate-[text-float-subtle_6s_ease-in-out_infinite_0.8s]">
+              <span className="inline-block animate-[text-glow-pulse_4s_ease-in-out_infinite]">
+                <span className="bg-gradient-to-r from-accent-blue via-accent-cyan via-white to-accent-blue bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-pan_4s_ease_infinite]">
+                  Sharper analytics.
+                </span>
               </span>
             </span>
           </h1>
@@ -204,7 +211,7 @@ const LandingPage = () => {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="relative rounded-2xl border border-edge-subtle bg-surface-card/60 p-7 backdrop-blur-md transition-all hover:border-accent-blue/40 hover:bg-surface"
+              className="relative rounded-2xl border border-edge-subtle bg-surface-card/60 p-7 shadow-inner-light backdrop-blur-md transition-all hover:border-accent-blue/40 hover:bg-surface"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-blue/30 bg-accent-blue/10 font-mono text-sm font-bold text-accent-cyan shadow-glow-blue">
                 {step.number}
@@ -229,7 +236,7 @@ const LandingPage = () => {
           </div>
           <Link
             to="/register"
-            className="text-xs font-semibold text-accent-cyan hover:underline inline-flex items-center gap-1"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-accent-cyan hover:underline"
           >
             See all developer features <FiArrowRight />
           </Link>
@@ -249,12 +256,17 @@ const LandingPage = () => {
           }`}
       >
         <div className="relative overflow-hidden rounded-3xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-10 shadow-2xl shadow-accent-blue/10 sm:p-16">
-          <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full bg-accent-blue/20 blur-[90px]" />
+          <img
+            src={Logo}
+            alt=""
+            className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 opacity-10 blur-[1px]"
+          />
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-64 w-96 -translate-x-1/2 rounded-full bg-accent-blue/20 blur-[90px]" />
 
           <h2 className="relative font-display text-3xl font-bold text-white sm:text-4xl">
             Start tracking high-performance short links today
           </h2>
-          <p className="relative mx-auto mt-4 max-w-md text-xs sm:text-sm text-slate-300">
+          <p className="relative mx-auto mt-4 max-w-md text-xs text-slate-300 sm:text-sm">
             Join thousands of developers, creators, and teams tracking their link engagement with LinkSphere.
           </p>
 

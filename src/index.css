@@ -29,27 +29,32 @@
   --shadow-glow-blue: 0 0 40px -10px rgba(59, 130, 246, 0.35);
   --shadow-glow-cyan: 0 0 35px -10px rgba(56, 189, 248, 0.35);
 
-  /* New Headline Animation Keyframes */
-  @keyframes gradient-flow {
-    0%, 100% { background-position: 0% 50%; }
+  /* === Continuous Headline Animation Keyframes === */
+  @keyframes gradient-pan {
+    0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
-  @keyframes title-reveal {
-    0% {
-      opacity: 0;
-      transform: translateY(24px) scale(0.98);
-      filter: blur(8px);
+  @keyframes text-glow-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.35)) drop-shadow(0 0 32px rgba(59, 130, 246, 0.2));
     }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
+    50% {
+      filter: drop-shadow(0 0 28px rgba(56, 189, 248, 0.7)) drop-shadow(0 0 50px rgba(59, 130, 246, 0.45));
     }
   }
 
-  --animation-gradient: gradient-flow 6s ease infinite;
-  --animation-reveal: title-reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  @keyframes text-float-subtle {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes white-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 }
 
 body {
@@ -68,6 +73,7 @@ html {
   color: var(--color-ink);
 }
 
+/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #030712; }
 ::-webkit-scrollbar-thumb { background: #152244; border-radius: 999px; }

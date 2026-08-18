@@ -1,9 +1,10 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LandingPage from './components/LandingPage'
 import AboutPage from './components/AboutPage'
+import RegisterPage from './components/RegisterPage'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           </Routes>
         </main>
         <Footer />

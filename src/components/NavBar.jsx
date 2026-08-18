@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { RxCross2 } from 'react-icons/rx'
 import { IoIosMenu } from 'react-icons/io'
-import { FiExternalLink, FiLayers } from 'react-icons/fi'
+import { FiExternalLink } from 'react-icons/fi'
+import Logo from '../assets/logo.svg'
 
 const NavBar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false)
@@ -28,8 +29,12 @@ const NavBar = () => {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-12">
         {/* Brand Logo */}
         <Link to="/" className="group flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-blue/40 bg-accent-blue/10 text-accent-cyan shadow-glow-blue transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-blue/20">
-            <FiLayers size={19} className="transition-transform duration-300 group-hover:rotate-6" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-blue/40 bg-accent-blue/10 p-1.5 shadow-glow-blue transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-blue/20">
+            <img 
+              src={Logo} 
+              alt="LinkSphere" 
+              className="h-full w-full object-contain transition-transform duration-300 group-hover:rotate-6" 
+            />
           </div>
           <span className="font-display text-lg font-bold tracking-tight text-white">
             Link<span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent">Sphere</span>
@@ -46,8 +51,8 @@ const NavBar = () => {
                 to={to}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-accent-blue/15 text-accent-cyan shadow-sm border border-accent-blue/30'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-surface-hover/60'
+                    ? 'border border-accent-blue/30 bg-accent-blue/15 text-accent-cyan shadow-sm'
+                    : 'text-slate-400 hover:bg-surface-hover/60 hover:text-slate-100'
                 }`}
               >
                 {label}
@@ -68,7 +73,7 @@ const NavBar = () => {
               </Link>
               <button
                 onClick={onLogOutHandler}
-                className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2 text-xs font-semibold text-red-400 transition-all duration-200 hover:bg-red-500/10 hover:border-red-500/40"
+                className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2 text-xs font-semibold text-red-400 transition-all duration-200 hover:border-red-500/40 hover:bg-red-500/10"
               >
                 Log out
               </button>
@@ -83,7 +88,7 @@ const NavBar = () => {
               </Link>
               <Link
                 to="/register"
-                className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg bg-gradient-to-r from-accent-blue to-accent-cyan p-[1px] font-semibold text-ink-950 shadow-glow-blue transition-all duration-300 hover:shadow-glow-cyan hover:scale-[1.02]"
+                className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg bg-gradient-to-r from-accent-blue to-accent-cyan p-[1px] font-semibold text-ink-950 shadow-glow-blue transition-all duration-300 hover:scale-[1.02] hover:shadow-glow-cyan"
               >
                 <span className="flex h-full w-full items-center gap-1.5 rounded-[7px] bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-1.5 text-xs font-bold text-ink-950">
                   Get Started
@@ -97,7 +102,7 @@ const NavBar = () => {
         {/* Mobile Toggle */}
         <button
           onClick={() => setNavbarOpen(!navbarOpen)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-edge-subtle bg-surface-card text-slate-300 sm:hidden hover:text-white"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-edge-subtle bg-surface-card text-slate-300 hover:text-white sm:hidden"
           aria-label="Toggle menu"
         >
           {navbarOpen ? <RxCross2 size={20} /> : <IoIosMenu size={22} />}
