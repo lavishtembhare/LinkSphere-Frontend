@@ -5,65 +5,61 @@ import { FiLayers, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import api from '../api/api'
 import TextField from './TextField'
+import { useStoreContext } from '../contextApi/ContextApi'
 
 const perks = [
-  'Custom vanity codes & branded aliases',
-  'Sub-second global redirection infrastructure',
-  'Real-time geographic & referrer analytics',
+  'Instant access to all shortened links',
+  'Live traffic telemetry & click graphs',
+  'Sub-second vanity link routing',
 ]
 
-const RegisterPage = () => {
+const Login = () => {
   const [loader, setLoader] = useState(false)
   const [serverError, setServerError] = useState('')
+  const { setToken } = useStoreContext()
   const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
       username: '',
-      email: '',
       password: '',
-      confirmPassword: '',
     },
     mode: 'onTouched',
   })
 
-  const passwordValue = watch('password')
-
-  const registerHandler = async (data) => {
+  const loginHandler = async (data) => {
     setLoader(true)
     setServerError('')
 
     const payload = {
       username: data.username.trim(),
-      email: data.email.trim(),
       password: data.password,
-      role: ['ROLE_USER'],
     }
 
     try {
-      const response = await api.post('/api/auth/public/register', payload)
+      const response = await api.post('/api/auth/public/login', payload)
+      const token = response.data?.token || response.data
 
-      const successMsg =
-        typeof response.data === 'string'
-          ? response.data
-          : response.data?.message || 'Registration Successful'
-
-      toast.success(successMsg)
-      reset()
-      navigate('/login')
+      if (token) {
+        setToken(token)
+        toast.success('Welcome back!')
+        reset()
+        navigate('/')
+      } else {
+        throw new Error('No token returned from server')
+      }
     } catch (err) {
       const message =
         err?.response?.data?.message ||
         (typeof err?.response?.data === 'string' ? err.response.data : null) ||
         (err?.request
-          ? 'Backend server unreachable. Make sure Spring Boot is running on port 8080.'
-          : 'Registration failed. Please try again.')
+          ? 'Backend server unreachable. Make sure Spring Boot is running.'
+          : 'Invalid username or password.')
 
       setServerError(message)
       toast.error(message)
@@ -74,11 +70,13 @@ const RegisterPage = () => {
 
   return (
     <div className="relative flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-ink bg-grid-pattern px-5 py-14 sm:px-8">
+      {/* Ambient Glows */}
       <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[450px] w-[700px] rounded-full bg-accent-blue/15 blur-[140px]" />
       <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-accent-cyan/10 blur-[110px]" />
 
       <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-edge-subtle bg-surface-card/85 shadow-2xl shadow-accent-blue/10 backdrop-blur-2xl">
         <div className="grid lg:grid-cols-5">
+          {/* Left Hero Panel */}
           <div className="relative hidden flex-col justify-between border-r border-edge-subtle bg-gradient-to-b from-ink-900/90 to-ink-950/90 p-10 lg:col-span-2 lg:flex">
             <div>
               <Link to="/" className="flex items-center gap-2.5">
@@ -91,10 +89,10 @@ const RegisterPage = () => {
               </Link>
 
               <h2 className="mt-10 font-display text-2xl font-bold leading-snug text-white">
-                Engineered for speed, built for scale.
+                Welcome back to your link telemetry hub.
               </h2>
               <p className="mt-3 text-xs leading-relaxed text-slate-400">
-                Create clean links, monitor live engagement telemetry, and safeguard access from a single command center.
+                Log in to generate secure vanity URLs, view analytics, and control routing.
               </p>
 
               <div className="mt-8 space-y-3.5">
@@ -108,22 +106,23 @@ const RegisterPage = () => {
             </div>
 
             <div className="border-t border-edge-subtle pt-6 text-[11px] text-slate-500">
-              Free plan available • No credit card required
+              Encrypted Session • JWT Authenticated
             </div>
           </div>
 
+          {/* Right Form Panel */}
           <div className="p-8 sm:p-12 lg:col-span-3">
             <div className="mb-6">
               <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-accent-cyan">
-                Authentication
+                Account Access
               </span>
               <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
-                Create your account
+                Sign in to LinkSphere
               </h1>
               <p className="mt-1 text-xs text-slate-400">
-                Already have an account?{' '}
-                <Link to="/login" className="font-medium text-accent-cyan hover:underline">
-                  Sign in
+                Don't have an account?{' '}
+                <Link to="/register" className="font-medium text-accent-cyan hover:underline">
+                  Create one free
                 </Link>
               </p>
             </div>
@@ -134,32 +133,14 @@ const RegisterPage = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(registerHandler)} className="space-y-4">
+            <form onSubmit={handleSubmit(loginHandler)} className="space-y-4">
               <TextField
                 label="Username"
                 id="username"
                 type="text"
                 required
-                min={3}
                 message="Username is required"
-                placeholder="Choose a username"
-                register={register}
-                errors={errors}
-              />
-
-              <TextField
-                label="Email"
-                id="email"
-                type="email"
-                required
-                message="Email address is required"
-                placeholder="name@company.com"
-                validation={{
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Enter a valid email address',
-                  },
-                }}
+                placeholder="Enter your username"
                 register={register}
                 errors={errors}
               />
@@ -169,24 +150,8 @@ const RegisterPage = () => {
                 id="password"
                 type="password"
                 required
-                min={6}
                 message="Password is required"
-                placeholder="Create a strong password"
-                register={register}
-                errors={errors}
-              />
-
-              <TextField
-                label="Confirm Password"
-                id="confirmPassword"
-                type="password"
-                required
-                message="Please confirm your password"
-                placeholder="Re-enter password"
-                validation={{
-                  validate: (value) =>
-                    value === passwordValue || 'Passwords do not match',
-                }}
+                placeholder="Enter your password"
                 register={register}
                 errors={errors}
               />
@@ -200,7 +165,7 @@ const RegisterPage = () => {
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
                 ) : (
                   <>
-                    <span>Register Account</span>
+                    <span>Sign In</span>
                     <FiArrowRight size={14} />
                   </>
                 )}
@@ -208,7 +173,7 @@ const RegisterPage = () => {
             </form>
 
             <p className="mt-5 text-center text-[11px] text-slate-500">
-              By registering, you agree to our Terms of Service & Privacy Policy.
+              Protected by LinkSphere Enterprise Token Shield.
             </p>
           </div>
         </div>
@@ -217,4 +182,4 @@ const RegisterPage = () => {
   )
 }
 
-export default RegisterPage
+export default Login
