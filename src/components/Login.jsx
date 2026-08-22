@@ -49,7 +49,7 @@ const Login = () => {
         setToken(token)
         toast.success('Welcome back!')
         reset()
-        navigate('/')
+        navigate('/dashboard')
       } else {
         throw new Error('No token returned from server')
       }

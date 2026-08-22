@@ -6,6 +6,7 @@ import RegisterPage from './components/RegisterPage'
 import Login from './components/Login'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
+import DashboardLayout from './Dashboard/DashboardLayout'
 import './App.css'
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<DashboardLayout />} />
           </Routes>
         </main>
         <Footer />

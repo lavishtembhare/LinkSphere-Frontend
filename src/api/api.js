@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080',
+  baseURL: '', // Empty base URL routes through Vite dev server proxy
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Automatically attach Bearer token if present
+// Automatically attach Bearer token to proxied requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
