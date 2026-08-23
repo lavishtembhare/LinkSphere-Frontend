@@ -12,6 +12,7 @@ const TextField = ({
   min,
   validation = {},
   placeholder,
+  autoComplete = 'on',
   ...rest
 }) => {
   const error = errors?.[id]
@@ -39,9 +40,10 @@ const TextField = ({
         <input
           id={id}
           type={type}
+          autoComplete={autoComplete}
           placeholder={placeholder}
           {...(register ? register(id, validationRules) : {})}
-          className={`w-full rounded-xl border bg-ink-950/80 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 backdrop-blur-md transition-all duration-200 focus:outline-none ${
+          className={`w-full rounded-xl border bg-ink-950 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-all duration-200 focus:outline-none ${
             error
               ? 'border-red-500/60 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
               : 'border-edge-subtle hover:border-accent-blue/40 focus:border-accent-blue focus:ring-1 focus:ring-accent-blue/30 focus:shadow-glow-blue'

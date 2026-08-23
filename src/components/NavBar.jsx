@@ -4,17 +4,22 @@ import { RxCross2 } from 'react-icons/rx'
 import { IoIosMenu } from 'react-icons/io'
 import { FiExternalLink } from 'react-icons/fi'
 import Logo from '../assets/logo.svg'
+import { useStoreContext } from '../contextApi/ContextApi'
 
 const NavBar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const path = location.pathname
-  const token = localStorage.getItem('token')
+
+  // 1. Consume reactive state from ContextApi instead of static localStorage
+  const { token, setToken } = useStoreContext()
 
   const onLogOutHandler = () => {
+    // 2. Clear both React Context state and localStorage
+    setToken(null)
     localStorage.removeItem('token')
-    navigate('/')
+    navigate('/login')
   }
 
   const navLinks = [
@@ -72,6 +77,7 @@ const NavBar = () => {
                 Dashboard
               </Link>
               <button
+                type="button"
                 onClick={onLogOutHandler}
                 className="rounded-lg border border-red-500/20 bg-red-500/5 px-3.5 py-2 text-xs font-semibold text-red-400 transition-all duration-200 hover:border-red-500/40 hover:bg-red-500/10"
               >
@@ -101,6 +107,7 @@ const NavBar = () => {
 
         {/* Mobile Toggle */}
         <button
+          type="button"
           onClick={() => setNavbarOpen(!navbarOpen)}
           className="flex h-9 w-9 items-center justify-center rounded-lg border border-edge-subtle bg-surface-card text-slate-300 hover:text-white sm:hidden"
           aria-label="Toggle menu"
@@ -124,13 +131,35 @@ const NavBar = () => {
               </Link>
             ))}
             <div className="my-2 h-px bg-edge-subtle" />
-            <Link
-              to="/register"
-              onClick={() => setNavbarOpen(false)}
-              className="w-full rounded-lg bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-center text-xs font-bold text-ink-950"
-            >
-              Get Started Free
-            </Link>
+            {token ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setNavbarOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNavbarOpen(false)
+                    onLogOutHandler()
+                  }}
+                  className="rounded-lg px-3 py-2 text-left text-sm font-medium text-red-400"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/register"
+                onClick={() => setNavbarOpen(false)}
+                className="w-full rounded-lg bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-center text-xs font-bold text-ink-950"
+              >
+                Get Started Free
+              </Link>
+            )}
           </div>
         </div>
       )}
