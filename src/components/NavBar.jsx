@@ -22,10 +22,10 @@ const NavBar = () => {
     navigate('/login')
   }
 
-  const navLinks = [
+const navLinks = [
     { label: 'Home', to: '/' },
-    { label: 'Features', to: '/#features' },
-    { label: 'How it Works', to: '/#how-it-works' },
+    { label: 'Features', to: '/features' },
+    { label: 'How it Works', to: '/how-it-works' },
     { label: 'About', to: '/about' },
   ]
 
