@@ -6,7 +6,7 @@ import RegisterPage from './components/RegisterPage'
 import Login from './components/Login'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
-import DashboardLayout from './Dashboard/DashboardLayout'
+import DashboardLayout from './components/Dashboard/DashboardLayout'
 import './App.css'
 
 function App() {
