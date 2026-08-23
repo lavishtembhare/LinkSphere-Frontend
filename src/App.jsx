@@ -7,6 +7,7 @@ import Login from './components/Login'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import DashboardLayout from './components/Dashboard/DashboardLayout'
+import UrlAnalyticsPage from './components/Dashboard/UrlDetailsPopUp'
 import './App.css'
 
 function App() {
@@ -15,7 +16,6 @@ function App() {
       <div className="flex min-h-screen flex-col bg-ink font-sans text-slate-100">
         <NavBar />
 
-        {/* Themed dark toast notifications */}
         <Toaster
           position="bottom-center"
           toastOptions={{
@@ -49,6 +49,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<DashboardLayout />} />
+            <Route path="/analytics/:shortUrl" element={<UrlAnalyticsPage />} />
           </Routes>
         </main>
         <Footer />

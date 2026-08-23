@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   FiMousePointer,
   FiCalendar,
   FiRefreshCw,
   FiPlus,
   FiZap,
+  FiLayers,
 } from 'react-icons/fi'
 import { useStoreContext } from '../../contextApi/ContextApi'
-import { useTotalClicks } from '../../hooks/useQuery'
+import { useTotalClicks, useMyUrls } from '../../hooks/useQuery'
 import Graph from './Graph'
 import ShortenPopUp from './ShortenPopUp'
+import ShortenUrlList from './ShortenUrlList'
 
 const DashboardLayout = () => {
   const { token } = useStoreContext()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const [shortenPopUp, setShortenPopUp] = useState(false)
   const [dayRange, setDayRange] = useState(25)
@@ -61,23 +65,40 @@ const DashboardLayout = () => {
     }
   }, [dayRange])
 
+  // 1. Fetch Daily Click Telemetry with both isLoading and isFetching
   const {
     data: totalClicksData = [],
     isLoading: isClicksLoading,
+    isFetching: isClicksFetching,
     refetch: refetchClicks,
   } = useTotalClicks(startDateStr, endDateStr, Boolean(token))
+
+  // 2. Fetch User's Managed Links
+  const {
+    data: myUrlsData = [],
+    isLoading: isUrlsLoading,
+    refetch: refetchMyUrls,
+  } = useMyUrls(Boolean(token))
 
   const calculatedTotalClicks = useMemo(() => {
     return totalClicksData.reduce((acc, curr) => acc + curr.clickCount, 0)
   }, [totalClicksData])
+
+  const handleRefetch = async () => {
+    await Promise.all([
+      refetchClicks(),
+      refetchMyUrls(),
+      queryClient.invalidateQueries({ queryKey: ['url-totalClicks'] }),
+      queryClient.invalidateQueries({ queryKey: ['my-urls'] }),
+    ])
+  }
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] bg-ink bg-grid-pattern px-5 py-10 sm:px-8 lg:px-12">
       <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[450px] w-[650px] rounded-full bg-accent-blue/10 blur-[140px]" />
 
       <div className="mx-auto max-w-6xl space-y-8">
-        
-        {/* Header Summary */}
+        {/* Header Summary Cards */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span className="font-mono text-xs font-semibold uppercase tracking-widest text-accent-cyan">
@@ -98,6 +119,7 @@ const DashboardLayout = () => {
               <span>Create Short Link</span>
             </button>
 
+            {/* Total Clicks */}
             <div className="flex items-center gap-3 rounded-2xl border border-edge-subtle bg-surface-card px-4 py-2.5 shadow-md">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue/15 text-accent-cyan">
                 <FiMousePointer size={18} />
@@ -106,6 +128,19 @@ const DashboardLayout = () => {
                 <p className="text-[10px] uppercase tracking-wider text-slate-400">Total Clicks</p>
                 <p className="font-mono text-lg font-bold text-white">
                   {isClicksLoading ? '...' : calculatedTotalClicks}
+                </p>
+              </div>
+            </div>
+
+            {/* Total Managed Links */}
+            <div className="flex items-center gap-3 rounded-2xl border border-edge-subtle bg-surface-card px-4 py-2.5 shadow-md">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue/15 text-accent-cyan">
+                <FiLayers size={18} />
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-slate-400">Active Links</p>
+                <p className="font-mono text-lg font-bold text-white">
+                  {isUrlsLoading ? '...' : myUrlsData.length}
                 </p>
               </div>
             </div>
@@ -139,18 +174,21 @@ const DashboardLayout = () => {
 
             <button
               type="button"
-              onClick={() => refetchClicks()}
+              onClick={handleRefetch}
               className="flex items-center gap-1.5 rounded-lg border border-edge-subtle bg-ink-950 px-3 py-1 text-xs text-slate-400 transition-colors hover:text-white"
             >
-              <FiRefreshCw size={12} /> Refresh
+              <FiRefreshCw size={12} className={isClicksFetching ? 'animate-spin text-accent-cyan' : ''} /> Refresh
             </button>
           </div>
         </div>
 
-        {/* Graph Component */}
-        <Graph graphData={totalClicksData} isLoading={isClicksLoading} />
+        {/* Telemetry Chart with Mutating Dots Loader */}
+        <Graph
+          graphData={totalClicksData}
+          isLoading={isClicksLoading || isClicksFetching}
+        />
 
-        {/* Action Trigger Card Below Graph */}
+        {/* Action Trigger Card */}
         <div className="relative overflow-hidden rounded-3xl border border-edge-subtle bg-surface-card/85 p-6 shadow-xl backdrop-blur-xl sm:p-8">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>
@@ -158,7 +196,7 @@ const DashboardLayout = () => {
                 Ready to generate another vanity slug?
               </h3>
               <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-                Shorten target links and inspect incoming click telemetry in real time.
+                Shorten target links and monitor traffic telemetry in real time.
               </p>
             </div>
 
@@ -172,13 +210,16 @@ const DashboardLayout = () => {
             </button>
           </div>
         </div>
+
+        {/* Managed Short URLs List */}
+        <ShortenUrlList data={myUrlsData} isLoading={isUrlsLoading} />
       </div>
 
-      {/* Shorten Modal */}
+      {/* Modal Popup */}
       <ShortenPopUp
         open={shortenPopUp}
         setOpen={setShortenPopUp}
-        refetch={refetchClicks}
+        refetch={handleRefetch}
       />
     </div>
   )

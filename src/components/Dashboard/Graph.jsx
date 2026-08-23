@@ -149,10 +149,25 @@ const Graph = ({ graphData = [], isLoading = false }) => {
         </div>
       </div>
 
-      <div className="relative h-72 w-full">
+      <div className="relative flex h-72 w-full items-center justify-center">
         {isLoading ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-accent-blue border-t-transparent" />
+          /* Mutating Telemetry Dots Loader */
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="relative flex items-center justify-center">
+              {/* Radial background pulse */}
+              <div className="absolute h-16 w-16 animate-ping rounded-full bg-accent-cyan/15 blur-sm" />
+
+              {/* Mutating sequence dots */}
+              <div className="flex items-center gap-2.5">
+                <span className="h-3.5 w-3.5 animate-bounce rounded-full bg-accent-cyan shadow-[0_0_14px_#38BDF8] [animation-delay:-0.32s]" />
+                <span className="h-3.5 w-3.5 animate-bounce rounded-full bg-accent-blue shadow-[0_0_14px_#3B82F6] [animation-delay:-0.16s]" />
+                <span className="h-3.5 w-3.5 animate-bounce rounded-full bg-white shadow-[0_0_14px_#FFFFFF]" />
+              </div>
+            </div>
+
+            <span className="font-mono text-xs uppercase tracking-widest text-slate-400">
+              Aggregating Telemetry Data...
+            </span>
           </div>
         ) : (
           <>{chartType === 'line' ? <Line data={data} options={options} /> : <Bar data={data} options={options} />}</>
