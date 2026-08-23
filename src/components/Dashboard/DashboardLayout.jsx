@@ -14,6 +14,7 @@ import { useTotalClicks, useMyUrls } from '../../hooks/useQuery'
 import Graph from './Graph'
 import ShortenPopUp from './ShortenPopUp'
 import ShortenUrlList from './ShortenUrlList'
+import Loader from '../Loader'
 
 const DashboardLayout = () => {
   const { token } = useStoreContext()
@@ -65,7 +66,7 @@ const DashboardLayout = () => {
     }
   }, [dayRange])
 
-  // 1. Fetch Daily Click Telemetry with both isLoading and isFetching
+  // 1. Daily Click Telemetry
   const {
     data: totalClicksData = [],
     isLoading: isClicksLoading,
@@ -73,7 +74,7 @@ const DashboardLayout = () => {
     refetch: refetchClicks,
   } = useTotalClicks(startDateStr, endDateStr, Boolean(token))
 
-  // 2. Fetch User's Managed Links
+  // 2. User's Managed Links
   const {
     data: myUrlsData = [],
     isLoading: isUrlsLoading,
@@ -91,6 +92,11 @@ const DashboardLayout = () => {
       queryClient.invalidateQueries({ queryKey: ['url-totalClicks'] }),
       queryClient.invalidateQueries({ queryKey: ['my-urls'] }),
     ])
+  }
+
+  // Display orbital loader on initial page load
+  if (isClicksLoading && isUrlsLoading) {
+    return <Loader label="Bootstrapping Command Center Telemetry..." />
   }
 
   return (
@@ -182,7 +188,7 @@ const DashboardLayout = () => {
           </div>
         </div>
 
-        {/* Telemetry Chart with Mutating Dots Loader */}
+        {/* Telemetry Chart */}
         <Graph
           graphData={totalClicksData}
           isLoading={isClicksLoading || isClicksFetching}
