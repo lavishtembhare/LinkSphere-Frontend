@@ -1,8 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  FiLink, FiBarChart2, FiFolder, FiEdit3, FiShield,
-  FiCopy, FiCheck, FiArrowRight, FiZap, FiCheckCircle
+  FiLink,
+  FiBarChart2,
+  FiFolder,
+  FiEdit3,
+  FiShield,
+  FiCopy,
+  FiCheck,
+  FiArrowRight,
+  FiZap,
+  FiCheckCircle,
+  FiTerminal,
+  FiRadio,
 } from 'react-icons/fi'
 import Card from './Card'
 import Logo from '../assets/logo.svg'
@@ -23,92 +33,173 @@ const steps = [
   { number: '03', title: 'Monitor engagement', desc: 'Watch real-time live click feeds and geographic traffic metrics populate.' },
 ]
 
+const DEMO_SAMPLES = [
+  {
+    long: 'https://github.com/torvalds/linux/commit/v6.12-rc1-arm64-telemetry',
+    short: 'linksphr.io/k9X2bQ',
+  },
+  {
+    long: 'https://store.notion.so/templates/engineering-system-architecture-2026',
+    short: 'linksphr.io/arch89',
+  },
+  {
+    long: 'https://linear.app/features/roadmaps/initiatives/q3-performance-audit',
+    short: 'linksphr.io/lin93v',
+  },
+  {
+    long: 'https://stripe.com/docs/billing/subscriptions/usage-based-meters-api',
+    short: 'linksphr.io/strp5x',
+  },
+]
+
 const HeroDemo = () => {
-  const [copied, setCopied] = useState(false)
-  const [urlInput, setUrlInput] = useState('https://github.com/features/actions/workflows/deploy-production-2026')
-  const [shortUrl, setShortUrl] = useState('linksphr.io/x7K9pQ')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const clicks = useCountUp(14280, 1400, true)
+  const [sampleIndex, setSampleIndex] = useState(0)
+  const [displayedLongUrl, setDisplayedLongUrl] = useState('')
+  const [displayedShortUrl, setDisplayedShortUrl] = useState('linksphr.io/k9X2bQ')
+  const [phase, setPhase] = useState('TYPING') // 'TYPING' | 'COMPRESSING' | 'GENERATED' | 'COPIED'
+  const [liveClicks, setLiveClicks] = useState(14280)
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(`https://${shortUrl}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+  const currentSample = DEMO_SAMPLES[sampleIndex]
 
-  const handleSimulate = (e) => {
-    e.preventDefault()
-    setIsGenerating(true)
-    setTimeout(() => {
-      setShortUrl(`linksphr.io/${Math.random().toString(36).substring(2, 8)}`)
-      setIsGenerating(false)
-    }, 450)
-  }
+  // Automated typing and sequence state machine
+  useEffect(() => {
+    let timeoutId
+
+    if (phase === 'TYPING') {
+      if (displayedLongUrl.length < currentSample.long.length) {
+        timeoutId = setTimeout(() => {
+          setDisplayedLongUrl(currentSample.long.slice(0, displayedLongUrl.length + 1))
+        }, 22)
+      } else {
+        timeoutId = setTimeout(() => setPhase('COMPRESSING'), 500)
+      }
+    } else if (phase === 'COMPRESSING') {
+      timeoutId = setTimeout(() => {
+        setDisplayedShortUrl(currentSample.short)
+        setLiveClicks((prev) => prev + Math.floor(Math.random() * 6) + 1)
+        setPhase('GENERATED')
+      }, 800)
+    } else if (phase === 'GENERATED') {
+      timeoutId = setTimeout(() => setPhase('COPIED'), 600)
+    } else if (phase === 'COPIED') {
+      timeoutId = setTimeout(() => {
+        setDisplayedLongUrl('')
+        setPhase('TYPING')
+        setSampleIndex((prev) => (prev + 1) % DEMO_SAMPLES.length)
+      }, 2200)
+    }
+
+    return () => clearTimeout(timeoutId)
+  }, [phase, displayedLongUrl, currentSample])
 
   return (
-    <div className="relative w-full max-w-lg rounded-2xl border border-edge-subtle bg-ink-900/90 p-6 shadow-2xl shadow-accent-blue/10 backdrop-blur-xl">
-      <div className="mb-4 flex items-center justify-between border-b border-edge-subtle pb-3">
+    <div className="relative w-full max-w-lg select-none rounded-3xl border border-edge-subtle bg-surface-card/90 p-6 shadow-2xl shadow-accent-blue/15 backdrop-blur-2xl">
+      {/* Background Neon Ambient Aura */}
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent-blue/20 blur-[80px]" />
+      <div className="pointer-events-none absolute -bottom-10 left-10 h-36 w-36 rounded-full bg-accent-cyan/10 blur-[60px]" />
+
+      {/* Terminal Header Bar */}
+      <div className="mb-5 flex items-center justify-between border-b border-edge-subtle pb-3.5">
         <div className="flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-          <span className="ml-2 font-mono text-[11px] text-slate-400">Live URL Sandbox</span>
+          <div className="ml-2 flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
+            <FiTerminal size={12} className="text-accent-cyan" />
+            <span>Autonomous Engine</span>
+          </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-400">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          {clicks.toLocaleString()} clicks tracked
-        </span>
+
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[11px] text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+            <span className="h-1.5 w-1.5 animate-ping rounded-full bg-emerald-400" />
+            {liveClicks.toLocaleString()} telemetry clicks
+          </span>
+        </div>
       </div>
 
-      <form onSubmit={handleSimulate} className="space-y-3">
+      <div className="space-y-4">
+        {/* Step 1: Animated Target URL Input */}
         <div>
-          <label className="mb-1 block text-[11px] font-medium text-slate-400">Target Long URL</label>
-          <div className="flex rounded-lg border border-edge-subtle bg-ink-950 px-3 py-2 focus-within:border-accent-blue/60">
-            <input
-              type="text"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              className="w-full bg-transparent font-mono text-xs text-slate-200 focus:outline-none"
-              placeholder="Paste URL here..."
-            />
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Target Long URL
+            </label>
+            <span className="flex items-center gap-1 font-mono text-[10px] text-accent-cyan">
+              <FiRadio size={10} className="animate-pulse" /> Live Stream
+            </span>
+          </div>
+
+          <div className="relative flex h-11 items-center overflow-hidden rounded-xl border border-edge-subtle bg-ink-950 px-3.5 font-mono text-xs text-slate-200 shadow-inner transition-colors focus-within:border-accent-blue/50">
+            <FiLink className="mr-2 shrink-0 text-accent-blue" size={14} />
+            <span className="truncate text-slate-100">
+              {displayedLongUrl}
+              <span className="inline-block h-3.5 w-1.5 animate-pulse bg-accent-cyan align-middle" />
+            </span>
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isGenerating}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-accent-blue/40 bg-accent-blue/20 py-2 text-xs font-semibold text-accent-cyan transition-all hover:bg-accent-blue/30"
+        {/* Step 2: Animated Button Trigger */}
+        <div
+          className={`flex h-11 w-full items-center justify-center gap-2 rounded-xl text-xs font-bold transition-all duration-300 ${
+            phase === 'COMPRESSING'
+              ? 'border border-accent-cyan/50 bg-accent-cyan/20 text-accent-cyan shadow-[0_0_20px_rgba(56,189,248,0.4)] scale-[0.99]'
+              : 'border border-edge-subtle bg-ink-950 text-slate-300'
+          }`}
         >
-          {isGenerating ? 'Shortening link...' : 'Compress URL'}
-          <FiZap size={13} />
-        </button>
-      </form>
+          {phase === 'COMPRESSING' ? (
+            <>
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-accent-cyan border-t-transparent" />
+              <span>Routing Edge Node...</span>
+            </>
+          ) : (
+            <>
+              <FiZap size={14} className="text-accent-cyan" />
+              <span>Compress URL</span>
+            </>
+          )}
+        </div>
 
-      <div className="mt-4 rounded-xl border border-edge-subtle bg-surface-card p-3.5">
-        <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">Shortened Link Output</span>
-        <div className="mt-1.5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 overflow-hidden font-mono text-sm font-semibold text-accent-cyan">
-            <FiLink className="shrink-0 text-accent-blue" size={15} />
-            <span className="truncate">{shortUrl}</span>
+        {/* Step 3: Shortened Link Output with Auto-Copy Action */}
+        <div className="rounded-2xl border border-edge-subtle bg-ink-950/70 p-4 backdrop-blur-md">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              Shortened Link Output
+            </span>
+            <span className="rounded-full border border-accent-blue/30 bg-accent-blue/10 px-2 py-0.5 font-mono text-[9px] text-accent-cyan">
+              Sub-50ms SLA
+            </span>
           </div>
 
-          <button
-            onClick={handleCopy}
-            className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${copied
-                ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                : 'bg-accent-blue font-bold text-ink hover:bg-accent-cyan'
+          <div className="mt-2.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 overflow-hidden font-mono text-sm font-bold text-accent-cyan">
+              <FiLink className="shrink-0 text-accent-blue" size={16} />
+              <span className="truncate transition-all duration-300">
+                {displayedShortUrl}
+              </span>
+            </div>
+
+            {/* Auto-Triggering Copy Pill */}
+            <div
+              className={`flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-300 ${
+                phase === 'COPIED'
+                  ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] scale-[1.04]'
+                  : 'border border-edge-subtle bg-ink-900 text-slate-400'
               }`}
-          >
-            {copied ? (
-              <>
-                <FiCheck size={13} /> Copied
-              </>
-            ) : (
-              <>
-                <FiCopy size={13} /> Copy
-              </>
-            )}
-          </button>
+            >
+              {phase === 'COPIED' ? (
+                <>
+                  <FiCheck size={13} className="text-emerald-400" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <FiCopy size={13} />
+                  <span>Copy</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -134,7 +225,6 @@ const LandingPage = () => {
           </div>
 
           <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.12]">
-            {/* Line 1: Continuous gentle float & subtle shimmer */}
             <span className="inline-block animate-[text-float-subtle_6s_ease-in-out_infinite]">
               <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-[length:200%_auto] bg-clip-text text-transparent animate-[white-shimmer_7s_ease_infinite]">
                 Smarter links.
@@ -143,7 +233,6 @@ const LandingPage = () => {
 
             <br />
 
-            {/* Line 2: Continuous electric-blue/cyan gradient wave + pulsing neon aura */}
             <span className="inline-block mt-1 animate-[text-float-subtle_6s_ease-in-out_infinite_0.8s]">
               <span className="inline-block animate-[text-glow-pulse_4s_ease-in-out_infinite]">
                 <span className="bg-gradient-to-r from-accent-blue via-accent-cyan via-white to-accent-blue bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient-pan_4s_ease_infinite]">
@@ -195,8 +284,9 @@ const LandingPage = () => {
       <section
         id="how-it-works"
         ref={howRef}
-        className={`mx-auto max-w-6xl px-5 py-24 transition-all duration-700 sm:px-8 lg:px-12 ${howVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-          }`}
+        className={`mx-auto max-w-6xl px-5 py-24 transition-all duration-700 sm:px-8 lg:px-12 ${
+          howVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
       >
         <div className="text-center">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-accent-cyan">
@@ -252,8 +342,9 @@ const LandingPage = () => {
       {/* CTA Section */}
       <section
         ref={ctaRef}
-        className={`relative mx-auto max-w-5xl px-5 py-24 text-center transition-all duration-700 sm:px-8 lg:px-12 ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-          }`}
+        className={`relative mx-auto max-w-5xl px-5 py-24 text-center transition-all duration-700 sm:px-8 lg:px-12 ${
+          ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
       >
         <div className="relative overflow-hidden rounded-3xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-10 shadow-2xl shadow-accent-blue/10 sm:p-16">
           <img
