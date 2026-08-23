@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FiLink, FiBarChart2, FiShield, FiZap, FiArrowRight, FiCheck } from 'react-icons/fi'
+import { FiLink, FiBarChart2, FiShield, FiZap, FiArrowRight } from 'react-icons/fi'
 import { useReveal } from '../hooks/useAnimations'
 
 const stats = [
@@ -42,12 +42,12 @@ const AboutPage = () => {
   const [gridRef, gridVisible] = useReveal()
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] overflow-hidden bg-ink bg-grid-pattern pb-24 pt-16">
+    <div className="relative min-h-[calc(100vh-64px)] overflow-hidden bg-ink bg-grid-pattern pb-16 pt-8 sm:pb-20 sm:pt-12 lg:pb-24 lg:pt-14">
       {/* Signature Ambient Glows */}
       <div className="pointer-events-none absolute -top-40 right-0 h-[450px] w-[450px] rounded-full bg-accent-blue/15 blur-[140px]" />
       <div className="pointer-events-none absolute top-96 -left-32 h-96 w-96 rounded-full bg-accent-cyan/10 blur-[130px]" />
 
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-8 lg:px-12">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div
           ref={headerRef}
@@ -59,24 +59,24 @@ const AboutPage = () => {
             <span>/about-linksphere</span>
           </div>
 
-          <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Every link has a destination.{' '}
             <span className="bg-gradient-to-r from-accent-blue via-accent-cyan to-white bg-clip-text text-transparent">
               We make the journey fast.
             </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-lg">
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-slate-400 sm:text-base lg:text-lg">
             LinkSphere was engineered to strip the noise out of link management. We provide clean vanity routing, granular click telemetry, and zero redirect latency — all accessible from a streamlined dashboard.
           </p>
         </div>
 
         {/* Stats Strip */}
-        <div className="mt-14 grid grid-cols-2 gap-4 rounded-2xl border border-edge-subtle bg-ink-surface/70 p-6 backdrop-blur-xl sm:grid-cols-4 sm:p-8">
+        <div className="mt-10 grid grid-cols-2 gap-3 rounded-2xl border border-edge-subtle bg-ink-surface/70 p-4 backdrop-blur-xl sm:grid-cols-4 sm:gap-4 sm:p-6 lg:p-8">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center sm:text-left">
-              <p className="font-display text-2xl font-bold text-white sm:text-3xl lg:text-4xl">{stat.value}</p>
-              <p className="mt-1 font-mono text-xs text-accent-cyan">{stat.label}</p>
+              <p className="font-display text-xl font-bold text-white sm:text-3xl lg:text-4xl">{stat.value}</p>
+              <p className="mt-0.5 font-mono text-[11px] text-accent-cyan sm:text-xs">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -84,7 +84,7 @@ const AboutPage = () => {
         {/* Feature Grid */}
         <div
           ref={gridRef}
-          className={`mt-16 grid gap-6 sm:grid-cols-2 transition-all duration-700 ${
+          className={`mt-10 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:mt-14 transition-all duration-700 ${
             gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
           }`}
         >
@@ -93,19 +93,19 @@ const AboutPage = () => {
             return (
               <div
                 key={feature.title}
-                className="group relative overflow-hidden rounded-2xl border border-edge-subtle bg-surface-card/80 p-7 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-accent-blue/50 hover:bg-surface hover:shadow-glow-blue"
+                className="group relative overflow-hidden rounded-2xl border border-edge-subtle bg-surface-card/80 p-5 sm:p-7 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-accent-blue/50 hover:bg-surface hover:shadow-glow-blue"
               >
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-accent-blue/30 bg-accent-blue/10 text-accent-cyan transition-colors group-hover:bg-accent-blue group-hover:text-ink">
-                    <Icon size={20} />
+                <div className="mb-3 flex items-center justify-between sm:mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-blue/30 bg-accent-blue/10 text-accent-cyan transition-colors group-hover:bg-accent-blue group-hover:text-ink sm:h-11 sm:w-11">
+                    <Icon size={18} />
                   </div>
                   <span className="font-mono text-xs text-slate-500">{feature.path}</span>
                 </div>
 
-                <h3 className="font-display text-lg font-semibold text-white group-hover:text-accent-cyan transition-colors">
+                <h3 className="font-display text-base font-semibold text-white group-hover:text-accent-cyan transition-colors sm:text-lg">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-400 sm:text-sm">
                   {feature.description}
                 </p>
               </div>
@@ -114,10 +114,10 @@ const AboutPage = () => {
         </div>
 
         {/* Bottom CTA Card */}
-        <div className="mt-20 rounded-2xl border border-edge-subtle bg-gradient-to-r from-surface-card to-ink-card p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-glow-blue">
-          <div>
-            <h3 className="font-display text-2xl font-bold text-white">Ready to shorten your first link?</h3>
-            <p className="mt-1 text-sm text-slate-400">Sign up in seconds and get complete access to tracking tools.</p>
+        <div className="mt-12 flex flex-col items-center justify-between gap-6 rounded-2xl border border-edge-subtle bg-gradient-to-r from-surface-card to-ink-card p-6 shadow-glow-blue sm:mt-16 sm:flex-row sm:p-8 lg:p-10">
+          <div className="text-center sm:text-left">
+            <h3 className="font-display text-xl font-bold text-white sm:text-2xl">Ready to shorten your first link?</h3>
+            <p className="mt-1 text-xs text-slate-400 sm:text-sm">Sign up in seconds and get complete access to tracking tools.</p>
           </div>
           <Link
             to="/register"

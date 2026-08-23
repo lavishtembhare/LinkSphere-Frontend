@@ -58,7 +58,7 @@ const Login = () => {
         err?.response?.data?.message ||
         (typeof err?.response?.data === 'string' ? err.response.data : null) ||
         (err?.request
-          ? 'Backend server unreachable. Make sure Spring Boot is running.'
+          ? 'server error'
           : 'Invalid username or password.')
 
       setServerError(message)
@@ -69,15 +69,15 @@ const Login = () => {
   }
 
   return (
-    <div className="relative flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-ink bg-grid-pattern px-5 py-14 sm:px-8">
+    <div className="relative flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-ink bg-grid-pattern px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
       {/* Ambient Glows */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[450px] w-[700px] rounded-full bg-accent-blue/15 blur-[140px]" />
-      <div className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-accent-cyan/10 blur-[110px]" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[350px] w-[500px] rounded-full bg-accent-blue/15 blur-[120px] sm:h-[450px] sm:w-[700px] sm:blur-[140px]" />
+      <div className="pointer-events-none absolute -bottom-20 -right-20 h-56 w-56 rounded-full bg-accent-cyan/10 blur-[90px] sm:h-72 sm:w-72 sm:blur-[110px]" />
 
-      <div className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-edge-subtle bg-surface-card/85 shadow-2xl shadow-accent-blue/10 backdrop-blur-2xl">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-edge-subtle bg-surface-card/90 shadow-2xl shadow-accent-blue/10 backdrop-blur-2xl sm:rounded-3xl lg:max-w-4xl">
         <div className="grid lg:grid-cols-5">
-          {/* Left Hero Panel */}
-          <div className="relative hidden flex-col justify-between border-r border-edge-subtle bg-gradient-to-b from-ink-900/90 to-ink-950/90 p-10 lg:col-span-2 lg:flex">
+          {/* Left Hero Panel (Desktop & Large Tablets) */}
+          <div className="relative hidden flex-col justify-between border-r border-edge-subtle bg-gradient-to-b from-ink-900/90 to-ink-950/90 p-8 lg:col-span-2 lg:flex lg:p-10">
             <div>
               <Link to="/" className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-blue/40 bg-accent-blue/10 text-accent-cyan shadow-glow-blue">
@@ -88,39 +88,39 @@ const Login = () => {
                 </span>
               </Link>
 
-              <h2 className="mt-10 font-display text-2xl font-bold leading-snug text-white">
+              <h2 className="mt-8 font-display text-xl font-bold leading-snug text-white lg:mt-10 lg:text-2xl">
                 Welcome back to your link telemetry hub.
               </h2>
-              <p className="mt-3 text-xs leading-relaxed text-slate-400">
+              <p className="mt-2.5 text-xs leading-relaxed text-slate-400">
                 Log in to generate secure vanity URLs, view analytics, and control routing.
               </p>
 
-              <div className="mt-8 space-y-3.5">
+              <div className="mt-6 space-y-3 lg:mt-8">
                 {perks.map((perk) => (
-                  <div key={perk} className="flex items-center gap-2.5 text-xs text-slate-300">
-                    <FiCheckCircle className="shrink-0 text-accent-cyan" size={15} />
+                  <div key={perk} className="flex items-center gap-2 text-xs text-slate-300">
+                    <FiCheckCircle className="shrink-0 text-accent-cyan" size={14} />
                     <span>{perk}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="border-t border-edge-subtle pt-6 text-[11px] text-slate-500">
+            <div className="border-t border-edge-subtle pt-5 text-[11px] text-slate-500">
               Encrypted Session • JWT Authenticated
             </div>
           </div>
 
-          {/* Right Form Panel */}
-          <div className="p-8 sm:p-12 lg:col-span-3">
-            <div className="mb-6">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-accent-cyan">
+          {/* Right Form Panel (Mobile, Tablet & Desktop) */}
+          <div className="p-5 sm:p-8 lg:col-span-3 lg:p-10">
+            <div className="mb-5 sm:mb-6">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan sm:text-[11px]">
                 Account Access
               </span>
-              <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
+              <h1 className="mt-1 font-display text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                 Sign in to LinkSphere
               </h1>
-              <p className="mt-1 text-xs text-slate-400">
-                Don't have an account?{' '}
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                Don&apos;t have an account?{' '}
                 <Link to="/register" className="font-medium text-accent-cyan hover:underline">
                   Create one free
                 </Link>
@@ -133,7 +133,7 @@ const Login = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(loginHandler)} className="space-y-4">
+            <form onSubmit={handleSubmit(loginHandler)} className="space-y-3.5 sm:space-y-4">
               <TextField
                 label="Username"
                 id="username"
@@ -159,7 +159,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loader}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan py-3 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.01] hover:shadow-glow-cyan disabled:opacity-50"
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.01] hover:shadow-glow-cyan disabled:opacity-50 sm:mt-6 sm:py-3 sm:text-sm"
               >
                 {loader ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
@@ -172,7 +172,7 @@ const Login = () => {
               </button>
             </form>
 
-            <p className="mt-5 text-center text-[11px] text-slate-500">
+            <p className="mt-4 text-center text-[10px] text-slate-500 sm:mt-5 sm:text-[11px]">
               Protected by LinkSphere Enterprise Token Shield.
             </p>
           </div>

@@ -13,9 +13,9 @@ const ShortenPopUp = ({ open, setOpen, refetch }) => {
       onClose={handleClose}
       aria-labelledby="shorten-modal-title"
       aria-describedby="shorten-modal-description"
-      className="flex items-center justify-center p-4 backdrop-blur-md"
+      className="flex items-center justify-center p-3 backdrop-blur-md sm:p-4"
     >
-      <div className="w-full max-w-lg focus:outline-none">
+      <div className="flex w-full max-w-md items-center justify-center focus:outline-none">
         <CreateNewShorten setOpen={setOpen} refetch={refetch} />
       </div>
     </Modal>

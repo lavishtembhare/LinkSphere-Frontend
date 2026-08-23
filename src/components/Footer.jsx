@@ -13,6 +13,11 @@ import Logo from '../assets/logo.svg'
 
 const socials = [
   {
+    icon: FaEnvelope,
+    href: 'mailto:lavishtembhare93@gmail.com',
+    label: 'Email',
+  },
+  {
     icon: FaGithub,
     href: 'https://github.com/lavishtembhare',
     label: 'GitHub',
@@ -52,8 +57,8 @@ const socials = [
 const Footer = () => {
   return (
     <footer className="border-t border-edge-subtle bg-ink-950">
-      <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 lg:px-12">
-        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="flex flex-col items-center justify-between gap-5 md:flex-row md:gap-6">
           {/* Brand Logo */}
           <Link to="/" className="group flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-accent-blue/30 bg-accent-blue/10 p-1 text-accent-cyan shadow-glow-blue transition-all duration-300 group-hover:scale-105">
@@ -64,14 +69,14 @@ const Footer = () => {
             </span>
           </Link>
 
-          {/* Edge Node Operational Badge */}
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            <span className="font-mono text-xs text-slate-400">All edge systems operational</span>
+          {/* Operational Badge */}
+          <div className="flex items-center gap-2 rounded-full border border-edge-subtle bg-ink-900/60 px-3 py-1">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+            <span className="font-mono text-[11px] text-slate-400">All edge systems operational</span>
           </div>
 
-          {/* Social Icons Strip */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5">
+          {/* Responsive Social Icons */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {socials.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -82,15 +87,15 @@ const Footer = () => {
                 title={label}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-edge-subtle bg-surface-card text-slate-400 transition-all duration-200 hover:border-accent-blue/40 hover:bg-surface-hover hover:text-accent-cyan hover:shadow-glow-blue"
               >
-                <Icon size={14} />
+                <Icon size={13} />
               </a>
             ))}
           </div>
         </div>
 
         {/* Legal & Copyright */}
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-edge-subtle/60 pt-6 text-xs text-slate-500 sm:flex-row">
-          <p>&copy; 2026 LinkSphere Technologies Inc. All rights reserved.</p>
+        <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-edge-subtle/60 pt-5 text-xs text-slate-500 sm:flex-row">
+          <p className="text-center sm:text-left">&copy; 2026 LinkSphere Technologies Inc. All rights reserved.</p>
           <div className="flex gap-4">
             <Link to="/privacy" className="transition-colors hover:text-slate-300">
               Privacy Policy

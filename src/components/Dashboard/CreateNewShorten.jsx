@@ -65,17 +65,14 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
       const fullUrl = getFullShortUrl(res.shortUrl)
 
-      // Store created link to display success view
       setCreatedData({
         originalUrl: formData.originalUrl.trim(),
         shortUrl: res.shortUrl,
         fullShortUrl: fullUrl,
       })
 
-      // Auto-copy short link immediately
       await copyToClipboard(fullUrl)
 
-      // Trigger background queries refetch
       if (refetch) {
         await refetch()
       }
@@ -99,9 +96,9 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
   }
 
   return (
-    <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-edge-subtle bg-surface-card/95 p-6 shadow-2xl shadow-accent-blue/10 sm:p-8 backdrop-blur-2xl">
+    <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-edge-subtle bg-surface-card/95 p-4 shadow-2xl backdrop-blur-2xl sm:rounded-3xl sm:p-6 lg:p-7">
       {/* Ambient background glow */}
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent-blue/20 blur-[80px]" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-accent-blue/20 blur-[70px] sm:h-48 sm:w-48 sm:blur-[80px]" />
 
       {/* Close button */}
       <Tooltip title="Close" arrow>
@@ -109,30 +106,30 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
           type="button"
           disabled={loading}
           onClick={handleClose}
-          className="absolute right-5 top-5 rounded-xl border border-edge-subtle bg-ink-950/60 p-1.5 text-slate-400 transition-colors hover:border-accent-blue/40 hover:text-white"
+          className="absolute right-3.5 top-3.5 rounded-lg border border-edge-subtle bg-ink-950/60 p-1 text-slate-400 transition-colors hover:border-accent-blue/40 hover:text-white sm:right-5 sm:top-5 sm:rounded-xl sm:p-1.5"
         >
-          <RxCross2 className="text-xl" />
+          <RxCross2 className="text-lg sm:text-xl" />
         </button>
       </Tooltip>
 
       {!createdData ? (
         /* STEP 1: Link Generation Form */
-        <form onSubmit={handleSubmit(createShortUrlHandler)} className="space-y-4">
-          <div>
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-accent-cyan">
+        <form onSubmit={handleSubmit(createShortUrlHandler)} className="space-y-3 sm:space-y-4">
+          <div className="pr-6">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan sm:text-[11px]">
               Link Generator
             </span>
-            <h1 className="mt-1 font-display text-xl font-bold text-white sm:text-2xl">
+            <h1 className="mt-0.5 font-display text-lg font-bold text-white sm:text-xl">
               Create New Short URL
             </h1>
-            <p className="mt-1 text-xs text-slate-400">
-              Enter a destination link to generate and auto-copy a vanity short URL.
+            <p className="mt-0.5 text-xs text-slate-400">
+              Enter a destination link to generate a vanity short URL.
             </p>
           </div>
 
           <hr className="border-edge-subtle/60" />
 
-          <div className="pt-1">
+          <div className="pt-0.5">
             <TextField
               label="Enter Target URL"
               required
@@ -145,12 +142,12 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3">
+          <div className="flex items-center justify-end gap-2 pt-2 sm:gap-3 sm:pt-3">
             <button
               type="button"
               disabled={loading}
               onClick={handleClose}
-              className="rounded-xl border border-edge-subtle bg-ink-950 px-5 py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-50"
+              className="rounded-xl border border-edge-subtle bg-ink-950 px-3.5 py-2 text-xs font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white disabled:opacity-50 sm:px-4 sm:py-2.5"
             >
               Cancel
             </button>
@@ -158,14 +155,14 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-6 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 sm:gap-2 sm:px-5 sm:py-2.5"
             >
               {loading ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-ink border-t-transparent sm:h-4 sm:w-4" />
               ) : (
                 <>
                   <span>Compress & Copy</span>
-                  <FiZap size={14} />
+                  <FiZap size={13} />
                 </>
               )}
             </button>
@@ -173,37 +170,37 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
         </form>
       ) : (
         /* STEP 2: Success & Generated Link Card */
-        <div className="space-y-5">
-          <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-[11px] font-semibold text-emerald-400">
-              <FiCheck size={13} /> Link Generated & Copied!
+        <div className="space-y-4 sm:space-y-5">
+          <div className="pr-6">
+            <div className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-emerald-400 sm:text-[11px]">
+              <FiCheck size={12} /> Link Generated & Copied!
             </div>
-            <h1 className="mt-2 font-display text-xl font-bold text-white sm:text-2xl">
+            <h1 className="mt-1.5 font-display text-lg font-bold text-white sm:text-xl">
               Short Link Ready
             </h1>
-            <p className="mt-1 text-xs text-slate-400">
-              Your shortened vanity link is active and logging telemetry.
+            <p className="mt-0.5 text-xs text-slate-400">
+              Your vanity link is active and logging telemetry.
             </p>
           </div>
 
           <hr className="border-edge-subtle/60" />
 
-          <div className="space-y-3 pt-1">
+          <div className="space-y-2.5 pt-0.5 sm:space-y-3">
             {/* Shortened URL Box */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-accent-cyan">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-accent-cyan sm:text-[10px]">
                 Short URL (Copied)
               </span>
-              <div className="mt-1.5 flex items-center justify-between gap-2 rounded-xl border border-accent-cyan/30 bg-ink-950 p-3 shadow-inner-light">
-                <div className="flex items-center gap-2 overflow-hidden font-mono text-xs font-semibold text-accent-cyan sm:text-sm">
-                  <FiLink className="shrink-0 text-accent-blue" size={15} />
+              <div className="mt-1 flex items-center justify-between gap-2 rounded-xl border border-accent-cyan/30 bg-ink-950 p-2.5 shadow-inner sm:p-3">
+                <div className="flex items-center gap-1.5 overflow-hidden font-mono text-xs font-semibold text-accent-cyan sm:text-sm">
+                  <FiLink className="shrink-0 text-accent-blue" size={14} />
                   <span className="truncate">{createdData.fullShortUrl}</span>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => copyToClipboard(createdData.fullShortUrl)}
-                  className={`flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  className={`flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all sm:px-3 sm:py-1.5 sm:text-xs ${
                     copied
                       ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
                       : 'bg-accent-blue text-ink hover:bg-accent-cyan'
@@ -211,11 +208,11 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
                 >
                   {copied ? (
                     <>
-                      <FiCheck size={13} /> Copied
+                      <FiCheck size={12} /> Copied
                     </>
                   ) : (
                     <>
-                      <FiCopy size={13} /> Copy
+                      <FiCopy size={12} /> Copy
                     </>
                   )}
                 </button>
@@ -224,31 +221,31 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
             {/* Original Destination URL */}
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 sm:text-[10px]">
                 Destination Target
               </span>
-              <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-edge-subtle bg-ink-950/60 p-3 text-xs text-slate-300">
-                <FiExternalLink className="shrink-0 text-slate-500" size={14} />
+              <div className="mt-1 flex items-center gap-2 rounded-xl border border-edge-subtle bg-ink-950/60 p-2.5 text-xs text-slate-300 sm:p-3">
+                <FiExternalLink className="shrink-0 text-slate-500" size={13} />
                 <span className="truncate">{createdData.originalUrl}</span>
               </div>
             </div>
           </div>
 
           {/* Bottom Actions */}
-          <div className="flex items-center justify-between gap-3 pt-3">
+          <div className="flex items-center justify-between gap-2 pt-2 sm:gap-3 sm:pt-3">
             <button
               type="button"
               onClick={handleResetForAnother}
-              className="flex items-center gap-1.5 rounded-xl border border-edge-subtle bg-ink-950 px-4 py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:border-accent-blue/40 hover:text-white"
+              className="flex items-center gap-1 rounded-xl border border-edge-subtle bg-ink-950 px-3 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-accent-blue/40 hover:text-white sm:px-4 sm:py-2.5"
             >
-              <FiPlus size={14} />
+              <FiPlus size={13} />
               <span>Create Another</span>
             </button>
 
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-6 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.02]"
+              className="rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.02] sm:px-5 sm:py-2.5"
             >
               Done
             </button>

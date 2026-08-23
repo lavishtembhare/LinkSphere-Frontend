@@ -8,9 +8,6 @@ import {
   FiArrowRight,
   FiCheck,
   FiTerminal,
-  FiShield,
-  FiZap,
-  FiServer,
   FiRepeat,
 } from 'react-icons/fi'
 import Logo from '../assets/logo.svg'
@@ -91,82 +88,79 @@ const faqs = [
 const HowItWorksPage = () => {
   return (
     <div className="relative overflow-hidden bg-ink bg-grid-pattern text-slate-100">
-      {/* Ambient background glows */}
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-accent-blue/15 blur-[140px]" />
       <div className="pointer-events-none absolute top-[800px] -left-32 h-[450px] w-[450px] rounded-full bg-accent-cyan/10 blur-[130px]" />
-      <div className="pointer-events-none absolute top-[1600px] -right-32 h-[500px] w-[500px] rounded-full bg-accent-blue/10 blur-[150px]" />
 
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         {/* Header Hero */}
         <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent-blue/30 bg-accent-blue/10 px-3.5 py-1 text-xs font-semibold text-accent-cyan backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent-blue/30 bg-accent-blue/10 px-3 py-1 text-xs font-semibold text-accent-cyan backdrop-blur-md">
             <FiRepeat className="animate-spin text-accent-cyan [animation-duration:8s]" size={13} />
             Architecture & Pipeline
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             How <span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent">LinkSphere</span> works.
           </h1>
 
-          <p className="mt-5 text-sm leading-relaxed text-slate-300 sm:text-base">
+          <p className="mt-4 text-xs leading-relaxed text-slate-300 sm:text-sm lg:text-base">
             From client input to edge redirection and telemetry logging—here is the end-to-end data lifecycle of every shortened URL.
           </p>
         </div>
 
-        {/* Step-by-Step Architecture Pipeline */}
-        <div className="mt-20 space-y-12">
+        {/* Pipeline Steps */}
+        <div className="mt-12 space-y-6 sm:mt-16 sm:space-y-8 lg:space-y-10">
           {workflowSteps.map((item, index) => {
-            const Icon = item.icon
             const isEven = index % 2 === 1
 
             return (
               <div
                 key={item.step}
-                className={`flex flex-col items-stretch gap-8 rounded-3xl border border-edge-subtle bg-surface-card/85 p-6 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-accent-blue/40 lg:flex-row sm:p-8 ${
+                className={`flex flex-col items-stretch gap-6 rounded-2xl border border-edge-subtle bg-surface-card/85 p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-accent-blue/40 sm:p-7 lg:flex-row ${
                   isEven ? 'lg:flex-row-reverse' : ''
                 }`}
               >
-                {/* Description Column */}
+                {/* Description */}
                 <div className="flex flex-1 flex-col justify-between space-y-4">
                   <div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-accent-blue/30 bg-accent-blue/10 font-mono text-sm font-bold text-accent-cyan shadow-glow-blue">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-blue/30 bg-accent-blue/10 font-mono text-xs font-bold text-accent-cyan shadow-glow-blue sm:h-10 sm:w-10 sm:text-sm">
                         {item.step}
                       </div>
-                      <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-accent-cyan">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-accent-cyan sm:text-[11px]">
                         {item.badge}
                       </span>
                     </div>
 
-                    <h2 className="mt-4 font-display text-2xl font-bold text-white sm:text-3xl">
+                    <h2 className="mt-3 font-display text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                       {item.title}
                     </h2>
 
-                    <p className="mt-3 text-xs leading-relaxed text-slate-300 sm:text-sm">
+                    <p className="mt-2 text-xs leading-relaxed text-slate-300 sm:text-sm">
                       {item.desc}
                     </p>
                   </div>
 
-                  <ul className="space-y-2 border-t border-edge-subtle/60 pt-4">
+                  <ul className="space-y-1.5 border-t border-edge-subtle/60 pt-3">
                     {item.highlights.map((highlight) => (
                       <li key={highlight} className="flex items-center gap-2 font-mono text-xs text-slate-400">
-                        <FiCheck className="shrink-0 text-accent-cyan" size={14} />
+                        <FiCheck className="shrink-0 text-accent-cyan" size={13} />
                         <span>{highlight}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Code Terminal Visualizer */}
-                <div className="flex-1 overflow-hidden rounded-2xl border border-edge-subtle bg-ink-950 p-4 shadow-2xl">
-                  <div className="mb-3 flex items-center justify-between border-b border-edge-subtle pb-2.5 text-xs text-slate-400 font-mono">
+                {/* Code Terminal */}
+                <div className="flex-1 overflow-hidden rounded-xl border border-edge-subtle bg-ink-950 p-3.5 shadow-2xl sm:p-4">
+                  <div className="mb-2.5 flex items-center justify-between border-b border-edge-subtle pb-2 text-xs text-slate-400 font-mono">
                     <div className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-                      <span className="ml-2 text-[10px] text-slate-500">Pipeline Stage {item.step}</span>
+                      <span className="h-2 w-2 rounded-full bg-red-500/80" />
+                      <span className="h-2 w-2 rounded-full bg-yellow-500/80" />
+                      <span className="h-2 w-2 rounded-full bg-emerald-500/80" />
+                      <span className="ml-1 text-[10px] text-slate-500">Stage {item.step} Payload</span>
                     </div>
-                    <FiTerminal size={13} className="text-accent-blue" />
+                    <FiTerminal size={12} className="text-accent-blue" />
                   </div>
                   <pre className="overflow-x-auto font-mono text-[11px] leading-relaxed text-slate-300">
                     <code>{item.codeSnippet}</code>
@@ -178,26 +172,26 @@ const HowItWorksPage = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-28">
+        <div className="mt-16 sm:mt-24">
           <div className="mx-auto max-w-2xl text-center">
             <span className="font-mono text-xs font-semibold uppercase tracking-widest text-accent-cyan">
               Technical FAQ
             </span>
-            <h2 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">
+            <h2 className="mt-1.5 font-display text-2xl font-bold text-white sm:text-4xl">
               Frequently Asked Questions
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
             {faqs.map((faq) => (
               <div
                 key={faq.q}
-                className="rounded-3xl border border-edge-subtle bg-surface-card/80 p-6 shadow-lg backdrop-blur-md"
+                className="rounded-2xl border border-edge-subtle bg-surface-card/80 p-5 shadow-lg backdrop-blur-md sm:p-6"
               >
-                <h3 className="font-display text-base font-bold text-white">
+                <h3 className="font-display text-sm font-bold text-white sm:text-base">
                   {faq.q}
                 </h3>
-                <p className="mt-3 text-xs leading-relaxed text-slate-400">
+                <p className="mt-2 text-xs leading-relaxed text-slate-400">
                   {faq.a}
                 </p>
               </div>
@@ -205,18 +199,16 @@ const HowItWorksPage = () => {
           </div>
         </div>
 
-        {/* Bottom Action CTA */}
-        <div className="relative mt-28 overflow-hidden rounded-3xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-10 shadow-2xl shadow-accent-blue/10 backdrop-blur-xl sm:p-14">
+        {/* Bottom CTA */}
+        <div className="relative mt-16 overflow-hidden rounded-2xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-6 shadow-2xl backdrop-blur-xl sm:mt-24 sm:p-10 lg:p-12">
           <img
             src={Logo}
             alt=""
             className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 opacity-10 blur-[1px]"
           />
-          <div className="pointer-events-none absolute -top-20 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-accent-blue/20 blur-[80px]" />
-
-          <div className="relative z-10 flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:text-left">
-            <div className="max-w-xl space-y-2">
-              <h3 className="font-display text-2xl font-bold text-white sm:text-3xl">
+          <div className="relative z-10 flex flex-col items-center justify-between gap-6 text-center sm:flex-row sm:text-left">
+            <div className="max-w-xl space-y-1.5">
+              <h3 className="font-display text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                 Ready to experience sub-second routing?
               </h3>
               <p className="text-xs text-slate-300 sm:text-sm">
@@ -224,15 +216,13 @@ const HowItWorksPage = () => {
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center justify-center">
-              <Link
-                to="/register"
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-7 py-3.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-200 hover:scale-[1.03]"
-              >
-                <span>Get Started Free</span>
-                <FiArrowRight size={14} />
-              </Link>
-            </div>
+            <Link
+              to="/register"
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-6 py-3 text-xs font-bold text-ink shadow-glow-blue transition-all duration-200 hover:scale-[1.03]"
+            >
+              <span>Get Started Free</span>
+              <FiArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </div>

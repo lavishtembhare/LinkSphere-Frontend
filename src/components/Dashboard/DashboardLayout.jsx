@@ -94,58 +94,60 @@ const DashboardLayout = () => {
     ])
   }
 
-  // Display orbital loader on initial page load
   if (isClicksLoading && isUrlsLoading) {
     return <Loader label="Bootstrapping Command Center Telemetry..." />
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-64px)] bg-ink bg-grid-pattern px-5 py-10 sm:px-8 lg:px-12">
-      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[450px] w-[650px] rounded-full bg-accent-blue/10 blur-[140px]" />
+    <div className="relative min-h-[calc(100vh-64px)] bg-ink bg-grid-pattern px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      {/* Ambient background lighting */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[350px] w-[500px] rounded-full bg-accent-blue/10 blur-[120px] sm:h-[450px] sm:w-[650px] sm:blur-[140px]" />
 
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* Header Summary Cards */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
+        
+        {/* Header & Metrics Section */}
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-accent-cyan">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan sm:text-xs">
               Command Center
             </span>
-            <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
+            <h1 className="mt-0.5 font-display text-xl font-bold text-white sm:text-2xl lg:text-3xl">
               Welcome back, <span className="capitalize text-accent-cyan">{username}</span>
             </h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+            {/* Create Short Link Button */}
             <button
               type="button"
               onClick={() => setShortenPopUp(true)}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-accent-blue to-accent-cyan px-5 py-3 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.03]"
+              className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] sm:col-auto sm:px-5 sm:py-3"
             >
-              <FiPlus size={16} />
+              <FiPlus size={15} />
               <span>Create Short Link</span>
             </button>
 
-            {/* Total Clicks */}
-            <div className="flex items-center gap-3 rounded-2xl border border-edge-subtle bg-surface-card px-4 py-2.5 shadow-md">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue/15 text-accent-cyan">
-                <FiMousePointer size={18} />
+            {/* Total Clicks Card */}
+            <div className="flex items-center gap-2.5 rounded-xl border border-edge-subtle bg-surface-card px-3 py-2 shadow-md sm:rounded-2xl sm:px-4 sm:py-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/15 text-accent-cyan sm:h-9 sm:w-9 sm:rounded-xl">
+                <FiMousePointer size={15} className="sm:text-[18px]" />
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-slate-400">Total Clicks</p>
-                <p className="font-mono text-lg font-bold text-white">
+              <div className="min-w-0">
+                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">Total Clicks</p>
+                <p className="font-mono text-base font-bold text-white sm:text-lg">
                   {isClicksLoading ? '...' : calculatedTotalClicks}
                 </p>
               </div>
             </div>
 
-            {/* Total Managed Links */}
-            <div className="flex items-center gap-3 rounded-2xl border border-edge-subtle bg-surface-card px-4 py-2.5 shadow-md">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-blue/15 text-accent-cyan">
-                <FiLayers size={18} />
+            {/* Total Managed Links Card */}
+            <div className="flex items-center gap-2.5 rounded-xl border border-edge-subtle bg-surface-card px-3 py-2 shadow-md sm:rounded-2xl sm:px-4 sm:py-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/15 text-accent-cyan sm:h-9 sm:w-9 sm:rounded-xl">
+                <FiLayers size={15} className="sm:text-[18px]" />
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-slate-400">Active Links</p>
-                <p className="font-mono text-lg font-bold text-white">
+              <div className="min-w-0">
+                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">Active Links</p>
+                <p className="font-mono text-base font-bold text-white sm:text-lg">
                   {isUrlsLoading ? '...' : myUrlsData.length}
                 </p>
               </div>
@@ -154,24 +156,22 @@ const DashboardLayout = () => {
         </div>
 
         {/* Telemetry Filter Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <FiCalendar className="text-accent-cyan" size={14} />
-            <span className="font-mono text-xs text-slate-300">
-              {startDateStr} &rarr; {endDateStr}
-            </span>
+        <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-edge-subtle bg-ink-950/60 p-2.5 backdrop-blur-md sm:p-3">
+          <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-300 sm:text-xs">
+            <FiCalendar className="text-accent-cyan" size={13} />
+            <span>{startDateStr} &rarr; {endDateStr}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {[7, 14, 25, 30].map((days) => (
               <button
                 key={days}
                 type="button"
                 onClick={() => setDayRange(days)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                className={`rounded-lg px-2 py-0.5 text-[11px] font-medium transition-all sm:px-2.5 sm:py-1 sm:text-xs ${
                   dayRange === days
                     ? 'border border-accent-blue/40 bg-accent-blue/20 text-accent-cyan'
-                    : 'border border-edge-subtle bg-ink-950 text-slate-400 hover:text-white'
+                    : 'border border-edge-subtle bg-ink-900 text-slate-400 hover:text-white'
                 }`}
               >
                 {days}D
@@ -181,9 +181,10 @@ const DashboardLayout = () => {
             <button
               type="button"
               onClick={handleRefetch}
-              className="flex items-center gap-1.5 rounded-lg border border-edge-subtle bg-ink-950 px-3 py-1 text-xs text-slate-400 transition-colors hover:text-white"
+              className="flex items-center gap-1 rounded-lg border border-edge-subtle bg-ink-900 px-2.5 py-0.5 text-[11px] text-slate-400 transition-colors hover:text-white sm:px-3 sm:py-1 sm:text-xs"
             >
-              <FiRefreshCw size={12} className={isClicksFetching ? 'animate-spin text-accent-cyan' : ''} /> Refresh
+              <FiRefreshCw size={11} className={isClicksFetching ? 'animate-spin text-accent-cyan' : ''} />
+              <span className="hidden xs:inline">Refresh</span>
             </button>
           </div>
         </div>
@@ -195,13 +196,13 @@ const DashboardLayout = () => {
         />
 
         {/* Action Trigger Card */}
-        <div className="relative overflow-hidden rounded-3xl border border-edge-subtle bg-surface-card/85 p-6 shadow-xl backdrop-blur-xl sm:p-8">
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            <div>
-              <h3 className="font-display text-lg font-bold text-white sm:text-xl">
+        <div className="relative overflow-hidden rounded-2xl border border-edge-subtle bg-surface-card/85 p-4 shadow-xl backdrop-blur-xl sm:rounded-3xl sm:p-6 lg:p-7">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="space-y-0.5">
+              <h3 className="font-display text-base font-bold text-white sm:text-lg lg:text-xl">
                 Ready to generate another vanity slug?
               </h3>
-              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+              <p className="text-xs text-slate-400">
                 Shorten target links and monitor traffic telemetry in real time.
               </p>
             </div>
@@ -209,10 +210,10 @@ const DashboardLayout = () => {
             <button
               type="button"
               onClick={() => setShortenPopUp(true)}
-              className="flex shrink-0 items-center gap-2 rounded-2xl bg-gradient-to-r from-accent-blue to-accent-cyan px-6 py-3.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.03]"
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] sm:px-5 sm:py-3"
             >
-              <FiZap size={15} />
-              <span>Create a New Short URL</span>
+              <FiZap size={14} />
+              <span>Create New URL</span>
             </button>
           </div>
         </div>
@@ -221,7 +222,7 @@ const DashboardLayout = () => {
         <ShortenUrlList data={myUrlsData} isLoading={isUrlsLoading} />
       </div>
 
-      {/* Modal Popup */}
+      {/* Shorten Link Modal Popup */}
       <ShortenPopUp
         open={shortenPopUp}
         setOpen={setShortenPopUp}
