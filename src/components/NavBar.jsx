@@ -6,7 +6,7 @@ import { IoIosMenu } from 'react-icons/io'
 import { FiExternalLink } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import Logo from '../assets/logo.svg'
-import { useStoreContext } from '../contextApi/ContextApi'
+import { useStoreContext } from '../contextApi/contextApi'
 
 const NavBar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false)

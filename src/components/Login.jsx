@@ -5,7 +5,7 @@ import { FiLayers, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import api from '../api/api'
 import TextField from './TextField'
-import { useStoreContext } from '../contextApi/ContextApi'
+import { useStoreContext } from './contextApi/contextApi'
 
 const perks = [
   'Instant access to all shortened links',
