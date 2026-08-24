@@ -28,7 +28,8 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
   // Format full shortened link using subdomain or origin
   const getFullShortUrl = (shortSlug) => {
-    const subdomain = import.meta.env.VITE_REACT_SUBDOMAIN || window.location.origin
+    // const subdomain = import.meta.env.VITE_REACT_SUBDOMAIN || window.location.origin
+    const subdomain = import.meta.env.VITE_BACKEND_URL || window.location.origin
     const baseUrl = subdomain.endsWith('/') ? subdomain.slice(0, -1) : subdomain
     return `${baseUrl}/${shortSlug}`
   }
