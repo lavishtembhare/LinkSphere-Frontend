@@ -28,7 +28,10 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
   // Format full shortened link using subdomain or origin
   const getFullShortUrl = (shortSlug) => {
-    const subdomain =import.meta.env.VITE_BACKEND_URL || window.location.origin
+    const subdomain =
+      import.meta.env.VITE_REACT_SUBDOMAIN ||
+      import.meta.env.VITE_BACKEND_URL ||
+      'https://linksphere-backend-bn1u.onrender.com'
     const baseUrl = subdomain.endsWith('/') ? subdomain.slice(0, -1) : subdomain
     return `${baseUrl}/${shortSlug}`
   }
@@ -51,28 +54,18 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
   const createShortUrlHandler = async (formData) => {
     setLoading(true)
 
-    // Retrieve active JWT from React Context or fallback to LocalStorage
-    const rawToken = token || localStorage.getItem('token') || ''
-    const cleanToken = rawToken.replace(/^Bearer\s+/i, '').replace(/["']/g, '').trim()
-
-    if (!cleanToken) {
+    const activeToken = token || localStorage.getItem('token')
+    if (!activeToken) {
       toast.error('Session expired. Please sign in again.')
       setLoading(false)
       return
     }
 
     try {
-      const { data: res } = await api.post(
-        '/api/urls/shorten',
-        { originalUrl: formData.originalUrl.trim() },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${cleanToken}`,
-          },
-        }
-      )
+      // api.js interceptor automatically attaches the correct Bearer token
+      const { data: res } = await api.post('/api/urls/shorten', {
+        originalUrl: formData.originalUrl.trim(),
+      })
 
       const fullUrl = getFullShortUrl(res.shortUrl)
 
