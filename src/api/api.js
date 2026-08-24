@@ -1,13 +1,14 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '', // Empty base URL routes through Vite dev server proxy
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'https://linksphere-backend-54oe.onrender.com',
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 })
 
-// Automatically attach Bearer token to proxied requests
+// Attach JWT token from LocalStorage to all outgoing requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
