@@ -1,6 +1,6 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom'
-import { useStoreContext } from '/contextApi/contextApi'
+import { useStoreContext } from './contextApi/contextApi'
 
 const PrivateRoute = ({ children, publicPage = false }) => {
   const { token } = useStoreContext()
