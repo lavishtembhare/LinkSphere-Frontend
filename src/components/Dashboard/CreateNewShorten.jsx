@@ -6,7 +6,7 @@ import { FiZap, FiLink, FiCopy, FiCheck, FiExternalLink, FiPlus } from 'react-ic
 import toast from 'react-hot-toast'
 import api from '../../api/api'
 import TextField from '../TextField'
-import { useStoreContext } from '../../contextApi/contextApi'
+import { useStoreContext } from '../../contextApi/contextApi';
 
 const CreateNewShorten = ({ setOpen, refetch }) => {
   const { token } = useStoreContext()
