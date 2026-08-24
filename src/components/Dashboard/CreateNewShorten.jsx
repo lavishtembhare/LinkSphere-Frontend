@@ -6,7 +6,7 @@ import { FiZap, FiLink, FiCopy, FiCheck, FiExternalLink, FiPlus } from 'react-ic
 import toast from 'react-hot-toast'
 import api from '../../api/api'
 import TextField from '../TextField'
-import { useStoreContext } from '../../contextApi/contextApi';
+import { useStoreContext } from '../../contextApi/contextApi'
 
 const CreateNewShorten = ({ setOpen, refetch }) => {
   const { token } = useStoreContext()
@@ -28,8 +28,10 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
   // Format full shortened link using subdomain or origin
   const getFullShortUrl = (shortSlug) => {
-    // const subdomain = import.meta.env.VITE_REACT_SUBDOMAIN || window.location.origin
-    const subdomain = import.meta.env.VITE_BACKEND_URL || window.location.origin
+    const subdomain =
+      import.meta.env.VITE_REACT_SUBDOMAIN ||
+      import.meta.env.VITE_BACKEND_URL ||
+      window.location.origin
     const baseUrl = subdomain.endsWith('/') ? subdomain.slice(0, -1) : subdomain
     return `${baseUrl}/${shortSlug}`
   }
@@ -51,6 +53,17 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
 
   const createShortUrlHandler = async (formData) => {
     setLoading(true)
+
+    // Retrieve active JWT from React Context or fallback to LocalStorage
+    const rawToken = token || localStorage.getItem('token') || ''
+    const cleanToken = rawToken.replace(/^Bearer\s+/i, '').replace(/["']/g, '').trim()
+
+    if (!cleanToken) {
+      toast.error('Session expired. Please sign in again.')
+      setLoading(false)
+      return
+    }
+
     try {
       const { data: res } = await api.post(
         '/api/urls/shorten',
@@ -59,7 +72,7 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Authorization: 'Bearer ' + token,
+            Authorization: `Bearer ${cleanToken}`,
           },
         }
       )
@@ -79,7 +92,14 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
       }
       reset()
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Create ShortURL Failed')
+      const errorMsg =
+        error?.response?.data?.message ||
+        (typeof error?.response?.data === 'string' ? error.response.data : null) ||
+        (error?.message === 'Network Error'
+          ? 'Network Error: Render backend is waking up or preflight was rejected.'
+          : 'Failed to create short URL.')
+
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
