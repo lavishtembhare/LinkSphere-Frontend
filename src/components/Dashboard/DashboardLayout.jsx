@@ -9,7 +9,7 @@ import {
   FiZap,
   FiLayers,
 } from 'react-icons/fi'
-import { useStoreContext } from '../contextApi/contextApi'
+import { useStoreContext } from '../../contextApi/contextApi'
 import { useTotalClicks, useMyUrls } from '../../hooks/useQuery'
 import Graph from './Graph'
 import ShortenPopUp from './ShortenPopUp'
