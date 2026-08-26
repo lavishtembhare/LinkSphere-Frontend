@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '../api/api'
 
 // 1. Fetch Total Clicks across all links for user
@@ -8,13 +8,11 @@ export const useTotalClicks = (startDate, endDate, enabled = true) => {
     queryFn: async () => {
       const res = await api.get('/api/urls/totalClicks', {
         params: {
-          startDate, // Format: YYYY-MM-DD (matches ISO_LOCAL_DATE)
+          startDate,
           endDate,
         },
       })
 
-      // Backend returns Map<LocalDate, Long>: { "2026-08-01": 5, "2026-08-02": 12 }
-      // Transform into [{ date: '2026-08-01', clickCount: 5 }, ...]
       if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
         return Object.entries(res.data)
           .map(([date, clickCount]) => ({
@@ -27,7 +25,7 @@ export const useTotalClicks = (startDate, endDate, enabled = true) => {
       return Array.isArray(res.data) ? res.data : []
     },
     enabled,
-    staleTime: 1000 * 60 * 2, // 2 mins cache
+    staleTime: 1000 * 60 * 2,
   })
 }
 
@@ -51,7 +49,6 @@ export const useUrlAnalytics = (shortUrl, startDateStr, endDateStr, enabled = tr
     queryFn: async () => {
       if (!shortUrl) return { timeline: [], raw: [] }
 
-      // Append T00:00:00 & T23:59:59 to satisfy backend ISO_LOCAL_DATE_TIME parser
       const startDateTime = `${startDateStr}T00:00:00`
       const endDateTime = `${endDateStr}T23:59:59`
 
@@ -64,7 +61,6 @@ export const useUrlAnalytics = (shortUrl, startDateStr, endDateStr, enabled = tr
 
       const rawEvents = Array.isArray(res.data) ? res.data : []
 
-      // Group click events by day for graph rendering
       const aggregated = rawEvents.reduce((acc, curr) => {
         const dateKey = curr.clickDate ? curr.clickDate.split('T')[0] : 'Recent'
         acc[dateKey] = (acc[dateKey] || 0) + (curr.count || 1)
@@ -83,5 +79,25 @@ export const useUrlAnalytics = (shortUrl, startDateStr, endDateStr, enabled = tr
     },
     enabled: Boolean(enabled && shortUrl),
     staleTime: 1000 * 60 * 2,
+  })
+}
+
+// 4. Delete Short URL Mutation
+export const useDeleteUrl = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (shortUrl) => {
+      const res = await api.delete('/api/urls/', {
+        params: {
+          shortUrl,
+        },
+      })
+      return res.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-urls'] })
+      queryClient.invalidateQueries({ queryKey: ['url-totalClicks'] })
+    },
   })
 }

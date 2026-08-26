@@ -10,6 +10,7 @@ import {
   FiCheck,
   FiCalendar,
   FiClock,
+  FiTrash2,
 } from 'react-icons/fi'
 import {
   Chart as ChartJS,
@@ -23,7 +24,7 @@ import {
 } from 'chart.js'
 import { Line, Bar } from 'react-chartjs-2'
 import toast from 'react-hot-toast'
-import { useUrlAnalytics } from '../../hooks/useQuery'
+import { useUrlAnalytics, useDeleteUrl } from '../../hooks/useQuery'
 
 ChartJS.register(
   CategoryScale,
@@ -38,8 +39,10 @@ ChartJS.register(
 const UrlDetailsPopUp = ({ open, setOpen, item }) => {
   const [chartType, setChartType] = useState('line')
   const [copied, setCopied] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  // 14-day date range for the mini velocity graph
+  const deleteUrlMutation = useDeleteUrl()
+
   const { startDateStr, endDateStr } = useMemo(() => {
     const end = new Date()
     const start = new Date()
@@ -58,7 +61,6 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
     }
   }, [])
 
-  // Fetch telemetry events for this link
   const { data: analyticsData, isLoading } = useUrlAnalytics(
     item?.shortUrl,
     startDateStr,
@@ -68,9 +70,10 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
 
   const timelineData = analyticsData?.timeline || []
 
-  // Construct full shortened URL
-  // const subdomain = import.meta.env.VITE_REACT_SUBDOMAIN || window.location.origin
-  const subdomain = import.meta.env.VITE_BACKEND_URL || window.location.origin
+  const subdomain =
+    import.meta.env.VITE_REACT_SUBDOMAIN ||
+    import.meta.env.VITE_BACKEND_URL ||
+    window.location.origin
   const baseUrl = subdomain.endsWith('/') ? subdomain.slice(0, -1) : subdomain
   const fullShortUrl = `${baseUrl}/${item?.shortUrl || ''}`
 
@@ -95,7 +98,22 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
     }
   }
 
-  // Mini Chart Configuration
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm(`Delete short URL /${item?.shortUrl}?`)
+    if (!confirmDelete) return
+
+    setIsDeleting(true)
+    try {
+      await deleteUrlMutation.mutateAsync(item.shortUrl)
+      toast.success('Short link deleted successfully')
+      setOpen(false)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Failed to delete link')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const labels = timelineData.map((d) => {
     const parts = d.date.split('-')
     return parts.length === 3 ? `${parts[1]}/${parts[2]}` : d.date
@@ -179,10 +197,8 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
     >
       <div className="flex h-full w-full items-center justify-center p-3 outline-none sm:p-4">
         <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-edge-subtle bg-surface-card/95 p-4 shadow-2xl backdrop-blur-2xl sm:rounded-3xl sm:p-6">
-          {/* Ambient Glow */}
           <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-accent-blue/20 blur-[70px] sm:h-48 sm:w-48 sm:blur-[80px]" />
 
-          {/* Close Button */}
           <MuiTooltip title="Close" arrow>
             <button
               type="button"
@@ -193,7 +209,6 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
             </button>
           </MuiTooltip>
 
-          {/* Header */}
           <div className="mb-3 pr-6 sm:mb-4">
             <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan sm:text-[11px]">
               Telemetry Inspector
@@ -204,7 +219,7 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
           </div>
 
           <div className="space-y-3">
-            {/* 1. GRAPH */}
+            {/* Velocity Graph */}
             <div className="rounded-xl border border-edge-subtle bg-ink-950/70 p-3 sm:rounded-2xl sm:p-3.5">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-1 font-mono text-[10px] text-slate-400 sm:text-xs">
@@ -258,7 +273,7 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
               </div>
             </div>
 
-            {/* 2. TOTAL CLICKS & CREATED DATE */}
+            {/* Metrics */}
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <div className="flex items-center gap-2 rounded-xl border border-accent-blue/20 bg-accent-blue/10 p-2.5 sm:rounded-2xl sm:gap-3 sm:p-3.5">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-blue/20 text-accent-cyan sm:h-9 sm:w-9 sm:rounded-xl">
@@ -289,7 +304,7 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
               </div>
             </div>
 
-            {/* 3. ORIGINAL URL */}
+            {/* Destination Target */}
             <div className="rounded-xl border border-edge-subtle bg-ink-950/60 p-2.5 sm:rounded-2xl sm:p-3.5">
               <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 sm:text-[10px]">
                 Destination Target
@@ -310,7 +325,7 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
               </div>
             </div>
 
-            {/* 4. SHORTEN URL (WITH COPY BUTTON) */}
+            {/* Short URL Box */}
             <div className="rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 p-2.5 sm:rounded-2xl sm:p-3.5">
               <span className="text-[9px] font-bold uppercase tracking-wider text-accent-cyan sm:text-[10px]">
                 Short URL Alias
@@ -336,11 +351,28 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
                     </>
                   ) : (
                     <>
-                      <FiCopy size={12} /> Copy
+                      <FiCopy size={12} /> Copy Link
                     </>
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Delete Modal Action */}
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleDelete}
+                className="flex items-center gap-1.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2 text-xs font-semibold text-red-400 transition-colors hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-300 disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+                ) : (
+                  <FiTrash2 size={13} />
+                )}
+                <span>Delete Short Link</span>
+              </button>
             </div>
           </div>
         </div>
