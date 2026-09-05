@@ -400,8 +400,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 # Environment variables
+
 .env
-.env.*
-!.env.example
-.env
-.env
+.env.local
+*.env
