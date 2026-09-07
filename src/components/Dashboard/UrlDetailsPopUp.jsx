@@ -70,10 +70,11 @@ const UrlDetailsPopUp = ({ open, setOpen, item }) => {
 
   const timelineData = analyticsData?.timeline || []
 
+  // Safe fallback to prevent undefined.endsWith() exceptions
   const subdomain =
-    import.meta.env.VITE_REACT_SUBDOMAIN ||
-    import.meta.env.VITE_BACKEND_URL ||
-    window.location.origin
+    // import.meta.env.VITE_REACT_SUBDOMAIN 
+    import.meta.env.VITE_BACKEND_URL 
+
   const baseUrl = subdomain.endsWith('/') ? subdomain.slice(0, -1) : subdomain
   const fullShortUrl = `${baseUrl}/${item?.shortUrl || ''}`
 

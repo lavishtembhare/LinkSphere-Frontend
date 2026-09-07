@@ -1,56 +1,92 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FiAlertTriangle, FiArrowLeft, FiCompass } from 'react-icons/fi'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import {
+  FiShieldOff,
+  FiAlertTriangle,
+  FiHome,
+} from 'react-icons/fi'
 
 const ErrorPage = ({
   code = '404',
   title = 'Page Not Found',
-  message = "We can't seem to find the edge route or resource you're looking for.",
+  message = "We can't seem to find the resource you're looking for.",
 }) => {
-  const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+
+  // Read from query params (from Spring Boot 302 redirect) or React Router state
+  const errorCode = searchParams.get('code') || location.state?.code || code
+  const errorTitle = searchParams.get('title') || location.state?.title || title
+  const rawMessage = searchParams.get('message') || location.state?.message || message
+  const errorMessage = decodeURIComponent(rawMessage)
+
+  const isSecurityBlock =
+    errorCode === '403' ||
+    errorMessage?.toLowerCase().includes('suspicious') ||
+    errorMessage?.toLowerCase().includes('disabled')
 
   return (
-    <div className="relative flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden bg-ink bg-grid-pattern px-4 py-10 text-center text-slate-100 sm:px-6 sm:py-14 lg:px-8">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[320px] w-[450px] rounded-full bg-accent-blue/15 blur-[120px] sm:h-[400px] sm:w-[500px] sm:blur-[140px]" />
-      <div className="pointer-events-none absolute -bottom-20 -right-20 h-48 w-48 rounded-full bg-accent-cyan/10 blur-[80px] sm:h-64 sm:w-64 sm:blur-[100px]" />
+    <div className="relative flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-ink bg-grid-pattern px-4 py-8 sm:px-6 lg:px-8">
+      {/* Background Ambient Glow */}
+      <div
+        className={`pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[350px] w-[500px] rounded-full blur-[130px] sm:h-[450px] sm:w-[700px] ${
+          isSecurityBlock ? 'bg-amber-500/15' : 'bg-accent-blue/15'
+        }`}
+      />
 
-      <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-2xl border border-edge-subtle bg-surface-card/90 p-5 shadow-2xl backdrop-blur-2xl sm:max-w-lg sm:gap-6 sm:rounded-3xl sm:p-8 lg:p-10">
-        {/* Glowing Badge */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent-blue/40 bg-accent-blue/10 text-accent-cyan shadow-glow-blue sm:h-14 sm:w-14 sm:rounded-2xl">
-          <FiAlertTriangle size={24} className="sm:text-[28px]" />
-        </div>
+      <div
+        className={`relative w-full max-w-lg overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-2xl sm:rounded-3xl sm:p-8 ${
+          isSecurityBlock
+            ? 'border-amber-500/30 bg-surface-card/95'
+            : 'border-edge-subtle bg-surface-card/90'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <div
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider ${
+              isSecurityBlock
+                ? 'border border-amber-500/30 bg-amber-500/10 text-amber-400'
+                : 'border border-accent-cyan/30 bg-accent-cyan/10 text-accent-cyan'
+            }`}
+          >
+            {isSecurityBlock ? <FiShieldOff size={13} /> : <FiAlertTriangle size={13} />}
+            <span>{isSecurityBlock ? 'Security Shield Triggered' : 'Error Notice'}</span>
+          </div>
 
-        {/* Status Code & Title */}
-        <div className="space-y-1.5 sm:space-y-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-accent-cyan sm:text-xs">
-            Error {code} • Routing Anomaly
+          <span className="font-mono text-xs font-semibold text-slate-500">
+            HTTP {errorCode}
           </span>
-          <h1 className="font-display text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">
-            {title}
-          </h1>
-          <p className="font-sans text-xs leading-relaxed text-slate-400 sm:text-sm">
-            {message}
-          </p>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex w-full flex-col gap-2.5 pt-1 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-3 sm:pt-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-edge-subtle bg-ink-950 px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-accent-blue/40 hover:text-white sm:w-auto sm:px-5 sm:py-2.5"
-          >
-            <FiArrowLeft size={13} />
-            <span>Go Back</span>
-          </button>
+        <div className="mt-5">
+          <h1 className="font-display text-xl font-bold text-white sm:text-2xl">
+            {isSecurityBlock ? 'Link Routing Suspended' : errorTitle}
+          </h1>
 
-          <Link
-            to="/dashboard"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-5 py-2 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] sm:w-auto sm:px-6 sm:py-2.5"
+          <div
+            className={`mt-3 rounded-xl p-3.5 text-xs ${
+              isSecurityBlock
+                ? 'border border-red-500/30 bg-red-500/10 text-red-200'
+                : 'border border-edge-subtle bg-ink-950/70 text-slate-300'
+            }`}
           >
-            <FiCompass size={13} />
-            <span>Command Center</span>
+            <p className="leading-relaxed font-medium">{errorMessage}</p>
+          </div>
+
+          {isSecurityBlock && (
+            <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+              This URL was automatically halted by DDoS burst mitigation or manually disabled. If you are the owner, sign in to your Command Center to review traffic logs and re-enable this link.
+            </p>
+          )}
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.02]"
+          >
+            <FiHome size={13} />
+            <span>Return Home</span>
           </Link>
         </div>
       </div>

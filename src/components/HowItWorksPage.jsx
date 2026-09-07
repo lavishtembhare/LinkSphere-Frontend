@@ -9,8 +9,10 @@ import {
   FiCheck,
   FiTerminal,
   FiRepeat,
+  FiActivity,
 } from 'react-icons/fi'
 import Logo from '../assets/logo.svg'
+import ThreeCanvas from './ThreeCanvas'
 
 const workflowSteps = [
   {
@@ -18,16 +20,16 @@ const workflowSteps = [
     badge: 'Step 1 • Ingestion',
     title: 'URL Ingestion & Validation',
     icon: FiLink,
-    desc: 'The client sends a payload containing the long destination URL. Client-side regex verifies format integrity while JWT authorization headers protect against unauthorized requests.',
+    desc: 'The client sends a payload containing the destination target. Client-side validation checks URL format while stateless JWT headers verify user ownership and screening shields.',
     codeSnippet: `POST /api/urls/shorten
 Host: api.linksphere.io
-Authorization: Bearer eyJhbGciOiJIUzI1Ni...
+Authorization: Bearer eyJhbGciOiJIUzM4NC...
 Content-Type: application/json
 
 {
   "originalUrl": "https://github.com/torvalds/linux"
 }`,
-    highlights: ['Sanitizes destination target', 'JWT session verification', 'Validates custom vanity alias availability'],
+    highlights: ['Sanitizes destination target', 'JWT session verification', 'Validates vanity slug availability'],
   },
   {
     step: '02',
@@ -59,7 +61,7 @@ Cache-Control: no-cache, no-store`,
     badge: 'Step 4 • Telemetry',
     title: 'Asynchronous Telemetry Ingestion',
     icon: FiBarChart2,
-    desc: 'Each redirect logs an asynchronous telemetry event (timestamp, status code, clicks) without impacting redirect speed. Data surfaces live on your interactive Chart.js dashboard.',
+    desc: 'Each redirect logs an asynchronous telemetry event (timestamp, IP hash, bot score) without impacting redirect speed. Data surfaces live on your interactive Chart.js dashboard.',
     codeSnippet: `GET /api/urls/analytics/k9X2bQ
 {
   "shortUrl": "k9X2bQ",
@@ -73,7 +75,7 @@ Cache-Control: no-cache, no-store`,
 const faqs = [
   {
     q: 'How does LinkSphere achieve sub-50ms redirects?',
-    a: 'By separating the user management dashboard from the dedicated redirect gateway (`url.domain.com`), lookup overhead is stripped down to raw in-memory index resolution.',
+    a: 'By separating the user management dashboard from the dedicated redirect gateway, lookup overhead is stripped down to raw in-memory index resolution.',
   },
   {
     q: 'Are shortened links permanent?',
@@ -88,10 +90,12 @@ const faqs = [
 const HowItWorksPage = () => {
   return (
     <div className="relative overflow-hidden bg-ink bg-grid-pattern text-slate-100">
+      <ThreeCanvas className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-40" />
+
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-accent-blue/15 blur-[140px]" />
       <div className="pointer-events-none absolute top-[800px] -left-32 h-[450px] w-[450px] rounded-full bg-accent-cyan/10 blur-[130px]" />
 
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         {/* Header Hero */}
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-accent-blue/30 bg-accent-blue/10 px-3 py-1 text-xs font-semibold text-accent-cyan backdrop-blur-md">
@@ -100,11 +104,15 @@ const HowItWorksPage = () => {
           </div>
 
           <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            How <span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent">LinkSphere</span> works.
+            How{' '}
+            <span className="bg-gradient-to-r from-accent-blue to-accent-cyan bg-clip-text text-transparent">
+              LinkSphere
+            </span>{' '}
+            works.
           </h1>
 
           <p className="mt-4 text-xs leading-relaxed text-slate-300 sm:text-sm lg:text-base">
-            From client input to edge redirection and telemetry logging—here is the end-to-end data lifecycle of every shortened URL.
+            From client input to edge redirection and telemetry logging — here is the end-to-end data lifecycle of every shortened URL.
           </p>
         </div>
 
@@ -116,7 +124,7 @@ const HowItWorksPage = () => {
             return (
               <div
                 key={item.step}
-                className={`flex flex-col items-stretch gap-6 rounded-2xl border border-edge-subtle bg-surface-card/85 p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-accent-blue/40 sm:p-7 lg:flex-row ${
+                className={`group flex flex-col items-stretch gap-6 rounded-2xl border border-edge-subtle bg-surface-card/85 p-5 shadow-xl backdrop-blur-xl transition-all duration-300 hover:border-accent-blue/40 sm:p-7 lg:flex-row ${
                   isEven ? 'lg:flex-row-reverse' : ''
                 }`}
               >
@@ -151,9 +159,9 @@ const HowItWorksPage = () => {
                   </ul>
                 </div>
 
-                {/* Code Terminal */}
+                {/* Code Terminal Box */}
                 <div className="flex-1 overflow-hidden rounded-xl border border-edge-subtle bg-ink-950 p-3.5 shadow-2xl sm:p-4">
-                  <div className="mb-2.5 flex items-center justify-between border-b border-edge-subtle pb-2 text-xs text-slate-400 font-mono">
+                  <div className="mb-2.5 flex items-center justify-between border-b border-edge-subtle pb-2 font-mono text-xs text-slate-400">
                     <div className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-red-500/80" />
                       <span className="h-2 w-2 rounded-full bg-yellow-500/80" />
@@ -182,7 +190,7 @@ const HowItWorksPage = () => {
             </h2>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {faqs.map((faq) => (
               <div
                 key={faq.q}
@@ -200,7 +208,7 @@ const HowItWorksPage = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="relative mt-16 overflow-hidden rounded-2xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-6 shadow-2xl backdrop-blur-xl sm:mt-24 sm:p-10 lg:p-12">
+        <div className="relative mt-16 overflow-hidden rounded-3xl border border-accent-blue/30 bg-gradient-to-b from-surface-card to-ink-900 p-6 shadow-2xl backdrop-blur-xl sm:mt-24 sm:p-10 lg:p-12">
           <img
             src={Logo}
             alt=""

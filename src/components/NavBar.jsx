@@ -6,6 +6,7 @@ import { IoIosMenu } from 'react-icons/io'
 import { FiExternalLink } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import Logo from '../assets/logo.svg'
+import api from '../api/api'
 import { useStoreContext } from '../contextApi/contextApi'
 
 const NavBar = () => {
@@ -15,14 +16,29 @@ const NavBar = () => {
   const queryClient = useQueryClient()
   const path = location.pathname
 
-  const { token, setToken } = useStoreContext()
+  const { token, refreshToken, clearAuth } = useStoreContext()
 
-  const onLogOutHandler = () => {
-    setToken(null)
-    localStorage.removeItem('token')
-    queryClient.clear()
-    toast.success('Logged out successfully')
-    navigate('/login')
+  const onLogOutHandler = async () => {
+    try {
+      if (refreshToken) {
+        await api.post(
+          '/api/auth/public/logout',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${refreshToken}`,
+            },
+          }
+        )
+      }
+    } catch {
+      // Clean up client state regardless of network status
+    } finally {
+      clearAuth()
+      queryClient.clear()
+      toast.success('Logged out successfully')
+      navigate('/login')
+    }
   }
 
   const navLinks = [
@@ -35,7 +51,6 @@ const NavBar = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-edge-subtle/80 bg-ink-950/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo */}
         <Link to="/" className="group flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent-blue/40 bg-accent-blue/10 p-1.5 shadow-glow-blue transition-all duration-300 group-hover:scale-105 group-hover:bg-accent-blue/20">
             <img
@@ -49,7 +64,6 @@ const NavBar = () => {
           </span>
         </Link>
 
-        {/* Desktop & Tablet Navigation */}
         <nav className="hidden items-center gap-1 rounded-full border border-edge-subtle bg-surface-card/60 px-2.5 py-1.5 shadow-inner-light backdrop-blur-md md:flex">
           {navLinks.map(({ label, to }) => {
             const isActive = path === to
@@ -69,7 +83,6 @@ const NavBar = () => {
           })}
         </nav>
 
-        {/* Desktop & Tablet Action Controls */}
         <div className="hidden items-center gap-2.5 sm:flex">
           {token ? (
             <>
@@ -108,7 +121,6 @@ const NavBar = () => {
           )}
         </div>
 
-        {/* Mobile & Tablet Dropdown Toggle */}
         <button
           type="button"
           onClick={() => setNavbarOpen(!navbarOpen)}
@@ -119,7 +131,6 @@ const NavBar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
       {navbarOpen && (
         <div className="border-b border-edge-subtle bg-ink-900/95 px-4 py-4 backdrop-blur-2xl sm:hidden">
           <div className="flex flex-col gap-2">

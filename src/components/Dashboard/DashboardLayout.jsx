@@ -8,12 +8,15 @@ import {
   FiPlus,
   FiZap,
   FiLayers,
+  FiTrendingUp,
+  FiSettings,
 } from 'react-icons/fi'
 import { useStoreContext } from '../../contextApi/contextApi'
-import { useTotalClicks, useMyUrls } from '../../hooks/useQuery'
+import { useTotalClicks, useMyUrls, useTotalClicksSummary } from '../../hooks/useQuery'
 import Graph from './Graph'
 import ShortenPopUp from './ShortenPopUp'
 import ShortenUrlList from './ShortenUrlList'
+import AccountSettingsModal from './AccountSettingsModal'
 import Loader from '../Loader'
 
 const DashboardLayout = () => {
@@ -22,6 +25,7 @@ const DashboardLayout = () => {
   const queryClient = useQueryClient()
 
   const [shortenPopUp, setShortenPopUp] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [dayRange, setDayRange] = useState(25)
 
   useEffect(() => {
@@ -66,7 +70,6 @@ const DashboardLayout = () => {
     }
   }, [dayRange])
 
-  // 1. Daily Click Telemetry
   const {
     data: totalClicksData = [],
     isLoading: isClicksLoading,
@@ -74,12 +77,17 @@ const DashboardLayout = () => {
     refetch: refetchClicks,
   } = useTotalClicks(startDateStr, endDateStr, Boolean(token))
 
-  // 2. User's Managed Links
   const {
     data: myUrlsData = [],
     isLoading: isUrlsLoading,
     refetch: refetchMyUrls,
   } = useMyUrls(Boolean(token))
+
+  const {
+    data: aiClickSummary = '',
+    isLoading: isSummaryLoading,
+    refetch: refetchSummary,
+  } = useTotalClicksSummary(startDateStr, endDateStr, Boolean(token))
 
   const calculatedTotalClicks = useMemo(() => {
     return totalClicksData.reduce((acc, curr) => acc + curr.clickCount, 0)
@@ -89,8 +97,10 @@ const DashboardLayout = () => {
     await Promise.all([
       refetchClicks(),
       refetchMyUrls(),
+      refetchSummary(),
       queryClient.invalidateQueries({ queryKey: ['url-totalClicks'] }),
       queryClient.invalidateQueries({ queryKey: ['my-urls'] }),
+      queryClient.invalidateQueries({ queryKey: ['url-totalClicks-summary'] }),
     ])
   }
 
@@ -100,12 +110,10 @@ const DashboardLayout = () => {
 
   return (
     <div className="relative min-h-[calc(100vh-64px)] bg-ink bg-grid-pattern px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-      {/* Ambient background lighting */}
       <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[350px] w-[500px] rounded-full bg-accent-blue/10 blur-[120px] sm:h-[450px] sm:w-[650px] sm:blur-[140px]" />
 
       <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8">
-        
-        {/* Header & Metrics Section */}
+        {/* Header & Metric Cards */}
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
           <div>
             <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan sm:text-xs">
@@ -121,10 +129,20 @@ const DashboardLayout = () => {
             <button
               type="button"
               onClick={() => setShortenPopUp(true)}
-              className="col-span-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] sm:col-auto sm:px-5 sm:py-3"
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan px-4 py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all duration-300 hover:scale-[1.02] sm:px-5 sm:py-3"
             >
               <FiPlus size={15} />
               <span>Create Short Link</span>
+            </button>
+
+            {/* Account Settings Button */}
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(true)}
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-edge-subtle bg-surface-card px-3.5 py-2.5 text-xs font-semibold text-slate-300 transition-colors hover:border-accent-blue/40 hover:bg-surface-hover hover:text-white sm:px-4 sm:py-3"
+            >
+              <FiSettings size={15} className="text-accent-cyan" />
+              <span>Settings</span>
             </button>
 
             {/* Total Clicks Card */}
@@ -133,20 +151,24 @@ const DashboardLayout = () => {
                 <FiMousePointer size={15} className="sm:text-[18px]" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">Total Clicks</p>
+                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">
+                  Total Clicks
+                </p>
                 <p className="font-mono text-base font-bold text-white sm:text-lg">
                   {isClicksLoading ? '...' : calculatedTotalClicks}
                 </p>
               </div>
             </div>
 
-            {/* Total Managed Links Card */}
+            {/* Active Links Card */}
             <div className="flex items-center gap-2.5 rounded-xl border border-edge-subtle bg-surface-card px-3 py-2 shadow-md sm:rounded-2xl sm:px-4 sm:py-2.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-blue/15 text-accent-cyan sm:h-9 sm:w-9 sm:rounded-xl">
                 <FiLayers size={15} className="sm:text-[18px]" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">Active Links</p>
+                <p className="truncate text-[9px] uppercase tracking-wider text-slate-400 sm:text-[10px]">
+                  Active Links
+                </p>
                 <p className="font-mono text-base font-bold text-white sm:text-lg">
                   {isUrlsLoading ? '...' : myUrlsData.length}
                 </p>
@@ -155,11 +177,37 @@ const DashboardLayout = () => {
           </div>
         </div>
 
+        {/* AI Plain-English Click Intelligence Summary Banner */}
+        {aiClickSummary && (
+          <div className="relative overflow-hidden rounded-2xl border border-accent-cyan/30 bg-gradient-to-r from-accent-blue/10 via-surface-card to-accent-cyan/10 p-4 shadow-lg backdrop-blur-xl">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-cyan/20 text-accent-cyan shadow-glow-cyan">
+                <FiTrendingUp size={16} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan">
+                    AI Traffic Intelligence
+                  </span>
+                  <span className="rounded-full bg-accent-cyan/15 px-2 py-0.5 text-[9px] font-bold text-accent-cyan">
+                    Groq Accelerated
+                  </span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-slate-200 sm:text-sm">
+                  {aiClickSummary}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Telemetry Filter Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-edge-subtle bg-ink-950/60 p-2.5 backdrop-blur-md sm:p-3">
           <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-300 sm:text-xs">
             <FiCalendar className="text-accent-cyan" size={13} />
-            <span>{startDateStr} &rarr; {endDateStr}</span>
+            <span>
+              {startDateStr} &rarr; {endDateStr}
+            </span>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -183,7 +231,10 @@ const DashboardLayout = () => {
               onClick={handleRefetch}
               className="flex items-center gap-1 rounded-lg border border-edge-subtle bg-ink-900 px-2.5 py-0.5 text-[11px] text-slate-400 transition-colors hover:text-white sm:px-3 sm:py-1 sm:text-xs"
             >
-              <FiRefreshCw size={11} className={isClicksFetching ? 'animate-spin text-accent-cyan' : ''} />
+              <FiRefreshCw
+                size={11}
+                className={isClicksFetching ? 'animate-spin text-accent-cyan' : ''}
+              />
               <span className="hidden xs:inline">Refresh</span>
             </button>
           </div>
@@ -200,10 +251,10 @@ const DashboardLayout = () => {
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div className="space-y-0.5">
               <h3 className="font-display text-base font-bold text-white sm:text-lg lg:text-xl">
-                Ready to generate another vanity slug?
+                Ready to generate another smart vanity slug?
               </h3>
               <p className="text-xs text-slate-400">
-                Shorten target links and monitor traffic telemetry in real time.
+                Automated AI slug synthesis, phishing screening, and background metadata extraction.
               </p>
             </div>
 
@@ -218,7 +269,7 @@ const DashboardLayout = () => {
           </div>
         </div>
 
-        {/* Managed Short URLs List */}
+        {/* Managed URLs List with AI Natural Search */}
         <ShortenUrlList data={myUrlsData} isLoading={isUrlsLoading} />
       </div>
 
@@ -227,6 +278,13 @@ const DashboardLayout = () => {
         open={shortenPopUp}
         setOpen={setShortenPopUp}
         refetch={handleRefetch}
+      />
+
+      {/* Account Settings & Security Modal */}
+      <AccountSettingsModal
+        open={settingsOpen}
+        setOpen={setSettingsOpen}
+        currentUsername={username}
       />
     </div>
   )
