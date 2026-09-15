@@ -8,11 +8,11 @@ import {
   FiUser,
   FiMail,
   FiTrash2,
-  FiKey,
   FiLock,
-  FiArrowRight,
   FiCheckCircle,
   FiAlertTriangle,
+  FiEye,
+  FiEyeOff,
 } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import api from '../../api/api'
@@ -21,36 +21,33 @@ import { useStoreContext } from '../../contextApi/contextApi'
 const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
   const [activeTab, setActiveTab] = useState('username') // 'username' | 'email' | 'delete'
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { setAuthTokens, clearAuth } = useStoreContext()
 
-  // 1. Username state
+  // 1. Username form state
   const [newUsername, setNewUsername] = useState('')
 
-  // 2. Email change state
+  // 2. Email form state (EmailChangeRequest: { newEmail, password })
   const [newEmail, setNewEmail] = useState('')
-  const [emailOtp, setEmailOtp] = useState('')
-  const [emailStep, setEmailStep] = useState(1) // 1: Request, 2: Confirm
+  const [emailPassword, setEmailPassword] = useState('')
 
-  // 3. Delete account state
+  // 3. Delete account form state (DeleteAccountRequest: { password })
   const [deletePassword, setDeletePassword] = useState('')
-  const [deleteOtp, setDeleteOtp] = useState('')
-  const [deleteStep, setDeleteStep] = useState(1) // 1: Password Auth, 2: OTP Confirmation
 
   const handleClose = () => {
     setNewUsername('')
     setNewEmail('')
-    setEmailOtp('')
-    setEmailStep(1)
+    setEmailPassword('')
     setDeletePassword('')
-    setDeleteOtp('')
-    setDeleteStep(1)
+    setShowPassword(false)
     setLoading(false)
     setOpen(false)
   }
 
-  // PATCH /api/users/username -> { "newUsername": "..." }
+  // 1. PATCH /api/users/username -> { "newUsername": "..." }
   const handleUpdateUsername = async (e) => {
     e.preventDefault()
     if (!newUsername.trim()) return
@@ -61,7 +58,6 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
         newUsername: newUsername.trim(),
       })
 
-      // Update tokens since the username is baked into the JWT
       if (data?.token) {
         setAuthTokens({
           token: data.token,
@@ -78,86 +74,45 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
     }
   }
 
-  // POST /api/users/email/request-change -> { "newEmail": "..." }
-  const handleRequestEmailChange = async (e) => {
+  // 2. PATCH /api/users/email -> { "newEmail": "...", "password": "..." }
+  const handleUpdateEmail = async (e) => {
     e.preventDefault()
-    if (!newEmail.trim()) return
+    if (!newEmail.trim() || !emailPassword) return
 
     setLoading(true)
     try {
-      const { data } = await api.post('/api/users/email/request-change', {
+      const { data } = await api.patch('/api/users/email', {
         newEmail: newEmail.trim(),
-      })
-      toast.success(data?.message || 'Verification code sent to your new email address.')
-      setEmailStep(2)
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to request email change.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // POST /api/users/email/confirm-change -> { "otp": "..." }
-  const handleConfirmEmailChange = async (e) => {
-    e.preventDefault()
-    if (emailOtp.trim().length !== 6) {
-      toast.error('Enter a valid 6-digit code')
-      return
-    }
-
-    setLoading(true)
-    try {
-      const { data } = await api.post('/api/users/email/confirm-change', {
-        otp: emailOtp.trim(),
+        password: emailPassword,
       })
       toast.success(data?.message || 'Email address updated successfully.')
       handleClose()
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Incorrect or expired verification code.')
+      toast.error(error?.response?.data?.message || 'Failed to update email.')
     } finally {
       setLoading(false)
     }
   }
 
-  // POST /api/users/delete-account/request -> { "password": "..." }
-  const handleRequestDeletion = async (e) => {
+  // 3. POST /api/users/delete-account -> { "password": "..." }
+  const handleDeleteAccount = async (e) => {
     e.preventDefault()
     if (!deletePassword) return
 
     setLoading(true)
     try {
-      const { data } = await api.post('/api/users/delete-account/request', {
+      const { data } = await api.post('/api/users/delete-account', {
         password: deletePassword,
       })
-      toast.success(data?.message || 'Verification code emailed.')
-      setDeleteStep(2)
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Incorrect password.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // POST /api/users/delete-account/confirm -> { "otp": "..." }
-  const handleConfirmDeletion = async (e) => {
-    e.preventDefault()
-    if (deleteOtp.trim().length !== 6) {
-      toast.error('Enter a valid 6-digit code')
-      return
-    }
-
-    setLoading(true)
-    try {
-      const { data } = await api.post('/api/users/delete-account/confirm', {
-        otp: deleteOtp.trim(),
-      })
-      toast.success(data?.message || 'Account permanently deleted.')
+      toast.success(
+        data?.message || 'Your account and all associated data have been permanently deleted.'
+      )
       clearAuth()
       queryClient.clear()
       handleClose()
       navigate('/register')
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to confirm account deletion.')
+      toast.error(error?.response?.data?.message || 'Incorrect password.')
     } finally {
       setLoading(false)
     }
@@ -187,7 +142,7 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
               type="button"
               disabled={loading}
               onClick={handleClose}
-              className="absolute right-4 top-4 rounded-lg border border-edge-subtle bg-ink-950/60 p-1.5 text-slate-400 hover:border-accent-blue/40 hover:text-white"
+              className="absolute right-4 top-4 rounded-lg border border-edge-subtle bg-ink-950/60 p-1.5 text-slate-400 transition-colors hover:border-accent-blue/40 hover:text-white"
             >
               <RxCross2 size={16} />
             </button>
@@ -196,7 +151,7 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
           {/* Modal Header */}
           <div className="mb-4 pr-6">
             <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent-cyan">
-              Security & Profile
+              Security &amp; Profile
             </span>
             <h2 className="mt-0.5 font-display text-lg font-bold text-white sm:text-xl">
               Account Settings
@@ -207,7 +162,7 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
             </p>
           </div>
 
-          {/* Navigation Tabs */}
+          {/* Tabs */}
           <div className="mb-5 flex rounded-xl border border-edge-subtle bg-ink-950/80 p-1 text-xs">
             <button
               type="button"
@@ -251,7 +206,7 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
           {activeTab === 'username' && (
             <form onSubmit={handleUpdateUsername} className="space-y-4">
               <div>
-                <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
                   New Username
                 </label>
                 <div className="relative mt-1">
@@ -266,7 +221,7 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
                   />
                 </div>
                 <span className="mt-1 block text-[10px] text-slate-500">
-                  Updates your username and regenerates an active JWT session.
+                  Saves the new username and rotates your active session credentials.
                 </span>
               </div>
 
@@ -287,175 +242,113 @@ const AccountSettingsModal = ({ open, setOpen, currentUsername }) => {
             </form>
           )}
 
-          {/* TAB 2: EMAIL CHANGE */}
+          {/* TAB 2: EMAIL UPDATE */}
           {activeTab === 'email' && (
-            <div>
-              {emailStep === 1 ? (
-                <form onSubmit={handleRequestEmailChange} className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                      New Email Address
-                    </label>
-                    <div className="relative mt-1">
-                      <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                      <input
-                        type="email"
-                        required
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        placeholder="newaddress@example.com"
-                        className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2.5 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-accent-blue focus:outline-none"
-                      />
-                    </div>
-                    <span className="mt-1 block text-[10px] text-slate-500">
-                      An OTP code will be sent to the new address to verify ownership.
-                    </span>
-                  </div>
+            <form onSubmit={handleUpdateEmail} className="space-y-3.5">
+              <div>
+                <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
+                  New Email Address
+                </label>
+                <div className="relative mt-1">
+                  <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                  <input
+                    type="email"
+                    required
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="newaddress@example.com"
+                    className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-accent-blue focus:outline-none"
+                  />
+                </div>
+              </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading || !newEmail.trim()}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.01] disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
-                    ) : (
-                      <>
-                        <span>Send Confirmation Code</span>
-                        <FiArrowRight size={13} />
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleConfirmEmailChange} className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                      Verification Code for {newEmail}
-                    </label>
-                    <div className="relative mt-1">
-                      <FiKey className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                      <input
-                        type="text"
-                        maxLength={6}
-                        required
-                        autoFocus
-                        value={emailOtp}
-                        onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="123456"
-                        className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2.5 pl-9 pr-3 font-mono text-center text-base tracking-[0.3em] text-accent-cyan focus:border-accent-blue focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || emailOtp.length !== 6}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.01] disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
-                    ) : (
-                      <>
-                        <FiCheckCircle size={14} />
-                        <span>Confirm &amp; Update Email</span>
-                      </>
-                    )}
-                  </button>
-
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
+                    Account Password
+                  </label>
                   <button
                     type="button"
-                    onClick={() => setEmailStep(1)}
-                    className="w-full text-center text-[11px] text-slate-400 hover:text-white hover:underline"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-accent-cyan"
                   >
-                    &larr; Re-enter email address
+                    {showPassword ? <FiEyeOff size={13} /> : <FiEye size={13} />}
+                    <span>{showPassword ? 'Hide' : 'Show'}</span>
                   </button>
-                </form>
-              )}
-            </div>
+                </div>
+                <div className="relative mt-1">
+                  <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={emailPassword}
+                    onChange={(e) => setEmailPassword(e.target.value)}
+                    placeholder="Enter current password to confirm"
+                    className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-accent-blue focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || !newEmail.trim() || !emailPassword}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-blue to-accent-cyan py-2.5 text-xs font-bold text-ink shadow-glow-blue transition-all hover:scale-[1.01] disabled:opacity-50"
+              >
+                {loading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
+                ) : (
+                  <>
+                    <FiCheckCircle size={14} />
+                    <span>Update Email Address</span>
+                  </>
+                )}
+              </button>
+            </form>
           )}
 
-          {/* TAB 3: ACCOUNT DELETION */}
+          {/* TAB 3: DELETE ACCOUNT */}
           {activeTab === 'delete' && (
             <div className="space-y-4">
               <div className="flex items-start gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">
                 <FiAlertTriangle className="mt-0.5 shrink-0 text-red-400" size={15} />
                 <p className="leading-relaxed">
-                  Permanently deletes your account, shortened URLs, click telemetry, and active tokens. This cannot be undone.
+                  Permanently deletes your user account, URLs, click telemetry events, and active sessions. This action cannot be reversed.
                 </p>
               </div>
 
-              {deleteStep === 1 ? (
-                <form onSubmit={handleRequestDeletion} className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300">
-                      Confirm Account Password
-                    </label>
-                    <div className="relative mt-1">
-                      <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                      <input
-                        type="password"
-                        required
-                        value={deletePassword}
-                        onChange={(e) => setDeletePassword(e.target.value)}
-                        placeholder="Enter your password"
-                        className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2.5 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-red-500 focus:outline-none"
-                      />
-                    </div>
+              <form onSubmit={handleDeleteAccount} className="space-y-4">
+                <div>
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
+                    Confirm Account Password
+                  </label>
+                  <div className="relative mt-1">
+                    <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                    <input
+                      type="password"
+                      required
+                      value={deletePassword}
+                      onChange={(e) => setDeletePassword(e.target.value)}
+                      placeholder="Enter password to authorize deletion"
+                      className="w-full rounded-xl border border-edge-subtle bg-ink-950 py-2.5 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-red-500 focus:outline-none"
+                    />
                   </div>
+                </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading || !deletePassword}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/40 bg-red-500/20 py-2.5 text-xs font-bold text-red-300 transition-all hover:bg-red-500/30 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
-                    ) : (
-                      <>
-                        <span>Send Deletion Confirmation Code</span>
-                        <FiArrowRight size={13} />
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleConfirmDeletion} className="space-y-4">
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-red-400">
-                      Enter 6-Digit Code Sent to Your Email
-                    </label>
-                    <div className="relative mt-1">
-                      <FiKey className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                      <input
-                        type="text"
-                        maxLength={6}
-                        required
-                        autoFocus
-                        value={deleteOtp}
-                        onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="123456"
-                        className="w-full rounded-xl border border-red-500/40 bg-ink-950 py-2.5 pl-9 pr-3 font-mono text-center text-base tracking-[0.3em] text-red-400 focus:border-red-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading || deleteOtp.length !== 6}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 text-xs font-bold text-white shadow-lg transition-all hover:bg-red-500 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    ) : (
-                      <>
-                        <FiTrash2 size={14} />
-                        <span>Permanently Delete Account</span>
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
+                <button
+                  type="submit"
+                  disabled={loading || !deletePassword}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-2.5 text-xs font-bold text-white shadow-lg transition-all hover:bg-red-500 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <>
+                      <FiTrash2 size={14} />
+                      <span>Permanently Delete Account</span>
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
           )}
         </div>
