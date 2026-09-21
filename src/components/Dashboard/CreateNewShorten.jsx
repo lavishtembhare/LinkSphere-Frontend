@@ -85,7 +85,7 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
         error?.response?.data?.message ||
         (typeof error?.response?.data === 'string' ? error.response.data : null) ||
         (error?.message === 'Network Error'
-          ? 'Network Error: Render backend is waking up or preflight was rejected.'
+          ? 'Network Error'
           : 'Failed to create short URL.')
 
       toast.error(errorMsg)
